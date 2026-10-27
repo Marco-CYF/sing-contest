@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>歌唱比賽評分系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0e1120;--bg2:#141830;--panel:#1a1f38;--panel2:#232948;--line:#30375c;
@@ -97,27 +99,186 @@ input[type=range].unset{accent-color:#555b78;opacity:.6}
 .jcard .jt{font-size:30px;font-weight:800;color:var(--gold);margin:4px 0;font-variant-numeric:tabular-nums}
 .avg{margin-top:14px;font-size:18px}.avg b{font-size:30px;color:var(--gold)}
 
-/* 大螢幕 */
-body[data-view=display] .top{opacity:.12;transition:.3s}
-body[data-view=display] .top:hover{opacity:1}
-body[data-view=display] main{max-width:none;padding:0}
-.disp{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;text-align:center;padding:4vh 4vw}
-.d-label{font-size:2.6vw;color:var(--gold);letter-spacing:.3em}
-.d-name{font-size:7vw;font-weight:900;line-height:1.15;margin:1vh 0}
-.d-song{font-size:4vw;color:var(--gold2);margin-top:3vh}
-.d-song span{display:block;font-size:1.6vw;color:var(--mute);letter-spacing:.3em}
-.d-artist{font-size:2vw;color:var(--mute);margin-top:1vh}
-.d-judges{display:flex;gap:2vw;justify-content:center;margin-top:6vh;font-size:1.6vw;color:var(--mute)}
-.d-judges span.ok{color:var(--ok)}
-.d-score{margin-top:5vh;font-size:9vw;font-weight:900;color:var(--gold);line-height:1}
-.d-score span{display:block;font-size:1.8vw;color:var(--mute);font-weight:400;letter-spacing:.3em}
-.d-res{width:min(1100px,92vw)}
-.d-res h2{font-size:3.4vw;margin:0 0 3vh;color:var(--gold)}
-.d-res .r{display:grid;grid-template-columns:5vw 1fr auto;gap:2vw;align-items:center;padding:1.4vh 2vw;border-bottom:1px solid var(--line);font-size:2.1vw;text-align:left}
-.d-res .r .rk{font-weight:900;color:var(--mute)}
-.d-res .r.t1 .rk,.d-res .r.t1 .sc{color:var(--gold)}
-.d-res .r .sc{font-weight:800;font-variant-numeric:tabular-nums}
+/* ===== 大螢幕畫面（以容器寬高為單位，大螢幕與導播台監看共用） ===== */
+.scr{--sa:#f2c14e;--sa2:#ffe6a6;--sb:#07091a;--st:#f6f3ec;--sm:rgba(246,243,236,.6);--sl:rgba(255,255,255,.13);--g1:rgba(118,72,255,.38);--g2:rgba(242,193,78,.22);
+  position:relative;overflow:hidden;container-type:size;background:var(--sb);color:var(--st);display:flex;flex-direction:column;
+  font-family:"Noto Sans TC",system-ui,"Microsoft JhengHei","PingFang TC",sans-serif;line-height:1.25}
+.scr.th-blue{--sa:#5cc8ff;--sa2:#c6ecff;--sb:#030a1c;--g1:rgba(0,110,255,.4);--g2:rgba(92,200,255,.2)}
+.scr.th-red{--sa:#ffcf6e;--sa2:#ffeac0;--sb:#130409;--g1:rgba(205,22,52,.45);--g2:rgba(255,207,110,.18)}
+.scr.th-light{--sa:#a26d12;--sa2:#5c3f0b;--sb:#f6f3ec;--st:#1a1916;--sm:rgba(26,25,22,.58);--sl:rgba(0,0,0,.1);--g1:rgba(162,109,18,.14);--g2:rgba(70,100,190,.1)}
+.scr-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.scr-bg .glow{position:absolute;inset:-20%;background:radial-gradient(38% 48% at 16% 12%,var(--g1),transparent 70%),radial-gradient(42% 52% at 88% 92%,var(--g2),transparent 70%);animation:drift 20s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(4%,-3%) scale(1.06)}}
+.scr-bg img{position:absolute;inset:-2%;width:104%;height:104%;object-fit:cover;filter:blur(.35cqw)}
+.scr-bg .dim{position:absolute;inset:0;background:var(--sb)}
+.scr>*:not(.scr-bg){position:relative;z-index:1}
+.scr-head{display:flex;justify-content:space-between;align-items:center;gap:3cqw;padding:2.4cqh 3.6cqw;font-size:1.45cqw;letter-spacing:.08em;border-bottom:1px solid var(--sl)}
+.scr-head:empty,.scr-tick:empty{display:none}
+.hd-l{display:flex;align-items:center;gap:1.2cqw;font-weight:700}
+.hd-l img{height:4.6cqh;max-width:14cqw;object-fit:contain}
+.hd-r{color:var(--sm);text-align:right}
+.scr-body{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4cqh 6cqw;text-align:center}
+.scr-tick{display:flex;align-items:stretch;height:7cqh;flex:none;background:rgba(0,0,0,.4);border-top:1px solid var(--sl);font-size:2cqw}
+.th-light .scr-tick{background:rgba(0,0,0,.05)}
+.tk-label{background:var(--sa);color:var(--sb);font-weight:900;display:flex;align-items:center;padding:0 2.2cqw;letter-spacing:.12em;white-space:nowrap}
+.tk-track{flex:1;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+.tk-track span{display:inline-block;padding-left:100%;animation:tick linear infinite}
+@keyframes tick{to{transform:translateX(-100%)}}
+.scr.clean .scr-head,.scr.clean .scr-tick{display:none}
+.scr.clean .scr-body{padding:0}
+.scr.black{background:#000}.scr.black>*{display:none}
 
+.eyebrow{font-size:1.5cqw;letter-spacing:.5em;color:var(--sa);font-weight:700;text-transform:uppercase;margin-bottom:2.2cqh;display:flex;align-items:center;justify-content:center;gap:1.4cqw}
+.big-title{font-size:6.4cqw;font-weight:900;line-height:1.15;margin:0;letter-spacing:.04em}
+.subt{font-size:2.3cqw;color:var(--sm);margin-top:3cqh;letter-spacing:.12em}
+.rule{width:7cqw;height:.45cqh;background:var(--sa);margin:4.5cqh auto 0;border-radius:9px}
+.st-logo{display:block;max-height:20cqh;max-width:36cqw;object-fit:contain;margin:0 auto 4cqh}
+.anim>*{animation:fadeUp .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(3cqh)}}
+
+.sc-poster{position:absolute;inset:0;background:#000}
+.sc-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.sc-poster.cover img.main{object-fit:cover}
+.sc-poster img.blur{object-fit:cover;filter:blur(3cqw) brightness(.4);transform:scale(1.15)}
+.sc-poster .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--sm);font-size:2.4cqw}
+
+.sc-current{width:100%;text-align:left}
+.sc-current .eyebrow{justify-content:flex-start}
+.cur-tag{letter-spacing:.15em;border:1px solid var(--sa);border-radius:99px;padding:.5cqh 1.3cqw;font-size:1.3cqw;text-transform:none}
+.cur-grid{display:grid;grid-template-columns:auto 1fr;gap:4.5cqw;align-items:center}
+.cur-no{font-size:17cqw;font-weight:900;line-height:.85;color:transparent;-webkit-text-stroke:.22cqw var(--sa);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cur-name{font-size:7.2cqw;font-weight:900;line-height:1.1;letter-spacing:.03em}
+.cur-song{font-size:3.6cqw;color:var(--sa2);margin-top:2.4cqh;display:flex;gap:1.4cqw;align-items:center;font-weight:700}
+.cur-song .note{display:inline-flex;align-items:center;justify-content:center;width:5.4cqw;height:5.4cqw;border-radius:50%;background:var(--sa);color:var(--sb);font-size:2.6cqw;flex:none}
+.cur-artist{font-size:1.9cqw;color:var(--sm);margin-top:1.4cqh;padding-left:6.8cqw}
+.jprog{display:flex;flex-wrap:wrap;gap:1.2cqh 3cqw;margin-top:6cqh;padding-top:3cqh;border-top:1px solid var(--sl)}
+.jp{display:flex;align-items:center;gap:.9cqw;font-size:1.6cqw;color:var(--sm)}
+.jp i{width:1.1cqw;height:1.1cqw;border-radius:50%;border:.2cqw solid var(--sm)}
+.jp.ok{color:var(--st)}.jp.ok i{background:var(--sa);border-color:var(--sa);box-shadow:0 0 1.2cqw var(--sa)}
+
+.sc-name{font-size:5.4cqw;font-weight:900}
+.sc-song{font-size:2.4cqw;color:var(--sa2);margin-top:1.4cqh}
+.sc-val{font-size:17cqw;font-weight:900;line-height:1;margin-top:3.5cqh;color:var(--sa);font-variant-numeric:tabular-nums;animation:pop 1s cubic-bezier(.2,1.5,.4,1) both;text-shadow:0 0 6cqw color-mix(in srgb,var(--sa) 45%,transparent)}
+.sc-val small{font-size:2.8cqw;color:var(--sm);font-weight:500;text-shadow:none}
+@keyframes pop{from{transform:scale(.55);opacity:0}}
+.sc-det{display:flex;justify-content:center;gap:1.8cqw;margin-top:4.5cqh;flex-wrap:wrap}
+.sc-det div{border:1px solid var(--sl);border-radius:1cqw;padding:1.6cqh 2.4cqw;min-width:13cqw;background:color-mix(in srgb,var(--st) 4%,transparent)}
+.sc-det span{display:block;font-size:1.35cqw;color:var(--sm)}.sc-det b{font-size:3cqw;font-variant-numeric:tabular-nums}
+.sc-wait{font-size:2.6cqw;color:var(--sm);margin-top:7cqh;display:flex;align-items:center;justify-content:center;gap:1.6cqw}
+.spin{width:2.6cqw;height:2.6cqw;border:.35cqw solid var(--sl);border-top-color:var(--sa);border-radius:50%;animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.sc-board,.sc-lineup{width:100%;max-width:82cqw}
+.sc-board h2,.sc-lineup h2{font-size:3.8cqw;margin:0 0 3.4cqh;font-weight:900;letter-spacing:.06em}
+.bd-list{display:grid;gap:1.3cqh}
+.bd-list.two{grid-auto-flow:column;grid-template-columns:1fr 1fr;column-gap:2.4cqw}
+.bd-row{display:grid;grid-template-columns:6.5cqw 1fr auto;align-items:center;gap:2cqw;padding:1.7cqh 2.4cqw;border-radius:1.1cqw;background:color-mix(in srgb,var(--st) 5%,transparent);border:1px solid var(--sl);text-align:left;font-size:2.4cqw}
+.bd-list.dense .bd-row{font-size:1.9cqw;padding:1.15cqh 2cqw}
+.bd-rk{font-weight:900;font-size:1.15em;color:var(--sm);text-align:center;font-variant-numeric:tabular-nums}
+.bd-nm{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bd-nm small{display:block;font-size:.58em;color:var(--sm);font-weight:400;margin-top:.3cqh;overflow:hidden;text-overflow:ellipsis}
+.bd-sc{font-weight:900;font-variant-numeric:tabular-nums;color:var(--sa)}
+.bd-row.r1{background:linear-gradient(90deg,color-mix(in srgb,#f2c14e 30%,transparent),color-mix(in srgb,#f2c14e 6%,transparent));border-color:#f2c14e}
+.bd-row.r1 .bd-rk{color:#f2c14e}.bd-row.r2 .bd-rk{color:#d3dbea}.bd-row.r3 .bd-rk{color:#e09a62}
+.th-light .bd-row.r1 .bd-rk{color:#a26d12}.th-light .bd-row.r2 .bd-rk{color:#6d7890}.th-light .bd-row.r3 .bd-rk{color:#a8602b}
+.bd-row.masked .bd-nm,.bd-row.masked .bd-sc{color:var(--sm);letter-spacing:.3em}
+.anim .bd-row,.anim .lu-row{animation:rowIn .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rowIn{from{opacity:0;transform:translateX(-3cqw)}}
+.bd-row.reveal{animation:revealRow 1.3s cubic-bezier(.2,.9,.3,1) both}
+@keyframes revealRow{0%{opacity:0;transform:scale(.9)}55%{opacity:1;transform:scale(1.05);box-shadow:0 0 5cqw var(--sa)}100%{transform:none;box-shadow:none}}
+
+.lu-list{display:grid;gap:1.1cqh}
+.lu-row{display:grid;grid-template-columns:6cqw 1fr 1.25fr 11cqw;gap:2cqw;align-items:center;padding:1.5cqh 2.4cqw;border-radius:1cqw;border:1px solid var(--sl);font-size:2.1cqw;text-align:left;background:color-mix(in srgb,var(--st) 3%,transparent)}
+.lu-row.done{opacity:.38}
+.lu-row.now{border-color:var(--sa);background:color-mix(in srgb,var(--sa) 16%,transparent)}
+.lu-row.next{border-color:color-mix(in srgb,var(--sa) 45%,transparent)}
+.lu-no{font-weight:900;color:var(--sa);font-variant-numeric:tabular-nums}
+.lu-nm{font-weight:800}.lu-song{color:var(--sm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lu-st{font-size:1.35cqw;letter-spacing:.15em;text-align:right;color:var(--sm)}
+.lu-row.now .lu-st{color:var(--sa);font-weight:900}
+
+/* 大螢幕裝置 */
+body[data-view=display] .top{display:none}
+body[data-view=display] main{max-width:none;padding:0}
+.dwrap .scr{width:100vw;height:100vh}
+.dwrap.idle{cursor:none}
+.dctl{position:fixed;right:14px;top:14px;z-index:5;display:flex;gap:8px;align-items:center;opacity:0;transition:.3s;background:rgba(0,0,0,.55);padding:8px 10px;border-radius:12px}
+.dwrap:not(.idle):hover .dctl{opacity:1}
+
+/* ===== 導播台 ===== */
+.sw-mons{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;margin-bottom:16px}
+.mon{background:#000;border-radius:14px;padding:10px;border:1px solid var(--line)}
+.mon.pg{border-color:#7d2331;box-shadow:0 0 0 1px #7d2331,0 10px 40px rgba(200,40,58,.18)}
+.mon-h{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:0 4px 8px;color:var(--mute)}
+.tag{font-weight:800;letter-spacing:.1em}.tag.pv{color:var(--ok)}.tag.pg{color:#ff5468}
+.mon .scr{width:100%;aspect-ratio:16/9;border-radius:6px}
+.sw-take{display:flex;flex-direction:column;align-items:center;gap:12px}
+.take{width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff5e6e,#b51d30);border:2px solid #ff8a96;color:#fff;font-weight:900;font-size:22px;letter-spacing:.08em;line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(200,40,58,.45)}
+.take small{font-size:12px;font-weight:600;letter-spacing:.2em;opacity:.85}
+.take:active{transform:scale(.95)}
+.take.same{filter:saturate(.35) brightness(.75);box-shadow:none}
+.scenes{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:12px}
+.scene{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;position:relative;font-weight:600}
+.scene .ic{font-size:22px;color:var(--gold)}
+.scene.sel{border-color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok);background:rgba(53,208,143,.08)}
+.scene.live::after{content:'LIVE';position:absolute;top:6px;right:6px;font-size:10px;background:#c8283a;color:#fff;padding:1px 6px;border-radius:4px;font-weight:800;letter-spacing:.05em}
+.ck{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;margin:4px 0 10px}
+.ck input{width:auto;accent-color:var(--gold)}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+.apick{display:flex;flex-wrap:wrap;gap:8px}
+.ap{width:92px;height:52px;padding:0;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mute)}
+.ap img{width:100%;height:100%;object-fit:contain}
+.ap.on{border:2px solid var(--gold);box-shadow:0 0 0 2px rgba(244,194,79,.25)}
+.reveal-box{margin-top:12px;padding:14px;border-radius:12px;border:1px solid #6b5520;background:rgba(244,194,79,.07)}
+.reveal-box p{margin:6px 0 10px}
+.btnlike{display:inline-flex;align-items:center;gap:6px;cursor:pointer;border-radius:10px;padding:8px 14px;background:var(--gold);color:#1d1600;font-weight:700}
+.assets{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:10px}
+.asset{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg2)}
+.asset.on{border-color:var(--gold)}
+.asset .th{aspect-ratio:16/9;background:#000;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:12px}
+.asset .th img{width:100%;height:100%;object-fit:contain}
+.asset .meta{padding:8px 10px;font-size:12px}
+.asset .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-size:13px}
+.asset .acts{display:flex;flex-wrap:wrap;gap:4px;padding:0 10px 10px}
+.asset .acts button{padding:3px 8px;font-size:12px}
+@media(max-width:1000px){.sw-mons{grid-template-columns:1fr}.sw-take{flex-direction:row}}
+
+
+/* ===== 賽程與晉級 ===== */
+.banner-ok{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:14px;border-radius:10px;background:rgba(53,208,143,.1);border:1px solid #1f6a4b;font-size:14px}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.flow-it{padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--bg2);min-width:150px}
+.flow-it.on{border-color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}
+.flow-n{font-weight:800;font-size:16px;display:flex;gap:8px;align-items:center}
+.flow-ar{color:var(--gold);font-size:22px}
+.rd.on{border-color:#1f6a4b}
+.rd-no{width:30px;height:30px;border-radius:50%;background:var(--gold);color:#1d1600;font-weight:900;display:inline-flex;align-items:center;justify-content:center}
+.rd-name{width:180px;font-size:17px;font-weight:800}
+.rd-set{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.rd-set .lbl{margin:0}.rd-set .lbl .small{display:block;margin-top:4px}
+.qp-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:6px}
+.qp{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg2)}
+.qp-list{max-height:280px;overflow:auto;margin-top:8px}
+.qp-row{display:grid;grid-template-columns:34px 1fr auto 64px;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;font-size:14px;color:var(--mute)}
+.qp-row.in{color:var(--text);background:rgba(53,208,143,.08)}
+.qp-row.in+.qp-row:not(.in){border-top:2px dashed var(--warn);border-radius:0 0 8px 8px}
+.qp-rk{font-weight:800;text-align:center}.qp-sc{font-variant-numeric:tabular-nums;font-weight:700}
+.qp-tag{color:var(--ok);font-weight:700;font-size:12px;text-align:right}
+.grp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.grp{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg2);display:flex;flex-direction:column;gap:2px}
+@media(max-width:1000px){.rd-set{grid-template-columns:1fr 1fr}}
+/* 大螢幕：晉級名單、總成績 */
+.sc-carry{font-size:2cqw;color:var(--sm);margin-top:1.5cqh}.sc-carry b{color:var(--st);font-size:2.6cqw}
+.sc-qual{width:100%;max-width:86cqw}
+.sc-qual h2{font-size:4cqw;margin:0 0 3cqh;font-weight:900;letter-spacing:.06em}
+.qg+.qg{margin-top:3cqh}
+.qg-h{display:flex;align-items:center;justify-content:center;gap:1.2cqw;font-size:2cqw;font-weight:800;color:var(--sa);margin-bottom:1.6cqh;letter-spacing:.2em}
+.qg-h span{font-size:1.3cqw;color:var(--sm);letter-spacing:.1em;font-weight:400}
+.qg-list{display:grid;gap:1.2cqh 1.6cqw}
+.qg-it{display:flex;align-items:baseline;gap:1.2cqw;padding:1.6cqh 2cqw;border-radius:1cqw;border:1px solid color-mix(in srgb,var(--sa) 45%,transparent);background:color-mix(in srgb,var(--sa) 10%,transparent);font-size:2.3cqw;text-align:left;animation:rowIn .6s cubic-bezier(.2,.8,.2,1) both}
+.qg-it span{font-size:1.4cqw;color:var(--sa);font-weight:900;font-variant-numeric:tabular-nums}
+.qg-it b{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qg-it small{font-size:1.3cqw;color:var(--sm);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:860px){.grid2{grid-template-columns:1fr}.crit{grid-template-columns:1fr 80px}.crit input[type=range]{grid-column:1/-1;order:3}}
 </style>
 </head>
@@ -150,6 +311,23 @@ if (!me.device) { me.device = uid(); LS.set('sc_device', me.device); }
 function saveMe() { LS.set('sc_label', me.label); LS.set('sc_role', me.role); LS.set('sc_seat', me.seat); }
 
 /* ================= 比賽資料 ================= */
+const DISPLAY_DEFAULT = () => ({
+  scene: 'standby', theme: 'gold', bg: null, bgDim: 80,
+  header: { on: true, left: '', right: '' },
+  ticker: { on: false, label: '最新消息', text: '', speed: 'normal' },
+  logo: { id: null, on: false },
+  standby: { label: 'Welcome', sub: '' },
+  poster: { id: null, fit: 'contain', clean: true },
+  current: { progress: true },
+  score: { detail: true },
+  board: { rid: '', group: '', top: 10, hide: 0, song: true },
+  qualify: { rid: '', song: false },
+  lineup: { count: 8 },
+  msg: { label: 'Intermission', title: '中場休息', sub: '比賽將於 15 分鐘後繼續' }
+});
+const ROUND_NAMES = ['初賽', '複賽', '決賽'];
+const ROUND_DEFAULT = i => ({ name: ROUND_NAMES[i] || `第 ${i + 1} 輪`, contestants: [], current: null, advance: i === 0 ? 5 : 0, advMode: 'group', advOrder: 'reverse', keepSong: false, auto: true, carry: 0 });
+const GROUP_PRESETS = ['個人組', '團體組'];
 const DEFAULT = () => ({
   settings: { title: '歌唱比賽', scale: 10, decimals: 2 },
   criteria: [
@@ -159,13 +337,34 @@ const DEFAULT = () => ({
     { id: 'c4', name: '台風與表現', weight: 15 }
   ],
   judges: [{ id: 's1', name: '評審老師 A' }, { id: 's2', name: '評審老師 B' }, { id: 's3', name: '評審老師 C' }],
-  contestants: [], current: null, status: {}, scores: {}, display: { mode: 'current' }
+  contestants: [], current: null, status: {}, scores: {}, assets: [], display: DISPLAY_DEFAULT()
 });
 function normalize(s) {
   s = (s && typeof s === 'object') ? s : {};
+  const legacyC = Array.isArray(s.contestants) ? s.contestants : null, legacyCur = s.current;
   const d = DEFAULT();
   for (const k in d) if (s[k] == null) s[k] = d[k];
   s.settings = Object.assign(d.settings, s.settings);
+  const dd = DISPLAY_DEFAULT(), od = (s.display && typeof s.display === 'object') ? s.display : {};
+  if (od.mode && !od.scene) od.scene = { current: 'current', score: 'score', results: 'board' }[od.mode] || 'current';
+  const disp = Object.assign({}, dd, od);
+  for (const k in dd) if (dd[k] && typeof dd[k] === 'object') disp[k] = Object.assign({}, dd[k], od[k] || {});
+  delete disp.mode; s.display = disp;
+  if (!Array.isArray(s.assets)) s.assets = [];
+  // 賽次：每個賽次有自己的名單與目前選手；S.contestants / S.current 永遠指向「進行中」的賽次
+  if (!s.rounds || typeof s.rounds !== 'object' || Array.isArray(s.rounds)) s.rounds = {};
+  if (!Array.isArray(s.roundIds) || !s.roundIds.length) s.roundIds = [...new Set(['r1', 'r2', ...Object.keys(s.rounds)])];
+  s.roundIds = s.roundIds.filter((x, i, a) => typeof x === 'string' && a.indexOf(x) === i);
+  s.roundIds.forEach((id, i) => {
+    const raw = (s.rounds[id] && typeof s.rounds[id] === 'object') ? s.rounds[id] : {};
+    const had = Array.isArray(raw.contestants), r = Object.assign(ROUND_DEFAULT(i), raw);
+    if (!had && i === 0 && legacyC) { r.contestants = legacyC; if (raw.current === undefined) r.current = legacyCur ?? null; }
+    if (!Array.isArray(r.contestants)) r.contestants = [];
+    r.contestants.forEach(c => { if (!c.pid) c.pid = c.id; });
+    s.rounds[id] = r;
+  });
+  if (!s.roundIds.includes(s.round)) s.round = s.roundIds[0];
+  s.contestants = s.rounds[s.round].contestants; s.current = s.rounds[s.round].current ?? null;
   return s;
 }
 
@@ -206,13 +405,42 @@ function result(cid) {
   const got = per.filter(x => x != null);
   return { per, n: got.length, avg: got.length ? got.reduce((a, b) => a + b, 0) / got.length : null };
 }
-function ranking(group) {
-  const rows = S.contestants.map((c, i) => ({ c, i, r: result(c.id) })).filter(x => !group || x.c.group === group);
-  const scored = rows.filter(x => x.r.avg != null).sort((a, b) => b.r.avg - a.r.avg);
+const R = rid => S.rounds[rid || S.round];
+const rName = rid => (R(rid) || {}).name || '';
+const prevRid = rid => { const i = S.roundIds.indexOf(rid); return i > 0 ? S.roundIds[i - 1] : null; };
+const nextRid = rid => { const i = S.roundIds.indexOf(rid); return i >= 0 && i < S.roundIds.length - 1 ? S.roundIds[i + 1] : null; };
+// 賽次總成績：本賽次平均，可依設定加計前一賽次成績
+function finalScore(rid, c, depth) {
+  const a = result(c.id).avg; if (a == null) return null;
+  const r = R(rid), carry = Math.max(0, Math.min(100, +r.carry || 0)), pr = prevRid(rid);
+  if (!carry || !pr || (depth || 0) > 6) return a;
+  const pc = R(pr).contestants.find(x => x.pid === c.pid);
+  const pf = pc ? finalScore(pr, pc, (depth || 0) + 1) : null;
+  return pf == null ? a : a * (100 - carry) / 100 + pf * carry / 100;
+}
+function rankRound(rid, group, exact) {
+  const rows = R(rid).contestants.map((c, i) => ({ c, i, r: result(c.id), f: finalScore(rid, c) }))
+    .filter(x => exact ? (x.c.group || '') === group : (!group || x.c.group === group));
+  const scored = rows.filter(x => x.f != null).sort((a, b) => b.f - a.f);
   let last = null, rank = 0;
-  scored.forEach((x, k) => { const v = fmt(x.r.avg); if (v !== last) { rank = k + 1; last = v; } x.rank = rank; });
+  scored.forEach((x, k) => { const v = fmt(x.f); if (v !== last) { rank = k + 1; last = v; } x.rank = rank; });
   return { rows, scored };
 }
+const ranking = group => rankRound(S.round, group);
+// 晉級名單：依設定取總排名或各組前 N 名；卡在最後名額同分者一併晉級
+function qualifiers(rid) {
+  const r = R(rid), n = +r.advance || 0; if (!n) return [];
+  const groups = r.advMode === 'group' ? [...new Set(r.contestants.map(c => c.group || ''))] : [null];
+  const out = [];
+  for (const g of groups) {
+    const { scored } = g === null ? rankRound(rid, '') : rankRound(rid, g, true);
+    const cut = scored[n - 1];
+    out.push(...(cut ? scored.filter(x => x.rank <= cut.rank) : scored));
+  }
+  return out;
+}
+const roundDone = rid => { const l = R(rid).contestants; return l.length > 0 && l.every(c => stOf(c.id) === 'locked'); };
+const hasScores = rid => R(rid).contestants.some(c => S.scores[c.id] && Object.keys(S.scores[c.id]).length);
 
 /* ================= 同步連線 ================= */
 function applyOp(s, op) {
@@ -267,7 +495,7 @@ async function gFetch(force) {
   gEtag = r.headers.get('ETag'); ingest(await r.json()); return true;
 }
 function splitState(s) {
-  const contest = clone(s); delete contest.scores;
+  const contest = clone(s); delete contest.scores; delete contest.contestants; delete contest.current;
   const sc = {};
   for (const cid in s.scores || {}) for (const seat in s.scores[cid] || {}) (sc[seat] = sc[seat] || {})[cid] = s.scores[cid][seat];
   return { contest, sc };
@@ -352,6 +580,7 @@ function startLocal() {
 function reconnect() { if (mode === 'server') openES(); else if (mode === 'gist') { clients = clients.filter(c => c.device !== me.device).concat([{ device: me.device, label: me.label, role: me.role, seat: me.seat, since: BOOT }]); gBeat(); gLoop(); } else { clients = [{ device: me.device, label: me.label, role: me.role, seat: me.seat, since: Date.now() }]; } }
 
 async function send(ops) {
+  ops = ops.map(op => { const p = op.path || []; return (p[0] === 'current' || p[0] === 'contestants') ? Object.assign({}, op, { path: ['rounds', S.round, ...p] }) : op; });
   if (mode === 'gist') return gSend(ops);
   if (mode === 'local') {
     for (const op of ops) {
@@ -402,12 +631,12 @@ function render() {
 }
 function renderTop() {
   document.title = S.settings.title + '｜評分系統';
-  put('top', [S.settings.title, me, online, mode, S.judges, gErr], () => {
+  put('top', [S.settings.title, me, online, mode, S.judges, gErr, S.round, S.roundIds.map(rName)], () => {
     let who = '';
     if (me.role === 'judge') who = `<span class="chip">🎤 評審席 ${seatNo(me.seat) || '?'}・${esc(jName(me.seat))}</span>`;
     else if (me.role === 'admin') who = `<span class="chip">🛠 管理員</span>`;
     else if (me.role === 'display') who = `<span class="chip">📺 大螢幕</span>`;
-    return `<span class="t">${esc(S.settings.title)}</span>${who}<span class="sp"></span>
+    return `<span class="t">${esc(S.settings.title)}</span><span class="chip">🏁 ${esc(rName())}</span>${who}<span class="sp"></span>
       ${me.label ? `<span class="chip small">💻 ${esc(me.label)}</span>` : ''}
       <span class="chip small"><span class="dot ${online ? 'on' : ''}"></span>${mode === 'local' ? '單機模式' : mode === 'gist' ? (online ? '☁ 雲端同步中' : '雲端連線失敗，重試中…') : (online ? '即時同步中' : '連線中斷，重新連線中…')}</span>
       ${me.role === 'display' ? `<button class="ghost sm" data-act="fs">全螢幕</button>` : ''}
@@ -456,11 +685,11 @@ function baseDraft(cid) {
 VIEW.judge = () => {
   const cur = cById(S.current), st = cur ? stOf(cur.id) : 'wait';
   const seatOk = !!S.judges.find(j => j.id === me.seat);
-  put('jStage', [seatOk, cur, st, idx(S.current), S.contestants.length], () => {
+  put('jStage', [seatOk, cur, st, idx(S.current), S.contestants.length, rName()], () => {
     if (!seatOk) return `<div class="warnbox">這台電腦對應的評審席已被管理員移除，請按右上角「切換身分」重新選擇。</div>`;
     if (!cur) return `<div class="empty">比賽尚未開始，請等待管理員選擇選手</div>`;
     const i = idx(cur.id);
-    return `<div class="row"><span class="chip ${st}">${ST_LABEL[st]}</span><span class="muted small">第 ${i + 1} / ${S.contestants.length} 位</span>${cur.group ? `<span class="chip">${esc(cur.group)}</span>` : ''}</div>
+    return `<div class="row"><span class="chip ${st}">${ST_LABEL[st]}</span><span class="chip">🏁 ${esc(rName())}</span><span class="muted small">第 ${i + 1} / ${S.contestants.length} 位</span>${cur.group ? `<span class="chip">${esc(cur.group)}</span>` : ''}</div>
       <div class="big-no">${i + 1}</div><div class="cname">${esc(cur.name || '（未填姓名）')}</div>
       <div class="song">🎵 ${esc(cur.song || '（未填曲目）')}</div>${cur.artist ? `<div class="muted">原唱／備註：${esc(cur.artist)}</div>` : ''}`;
   });
@@ -468,7 +697,7 @@ VIEW.judge = () => {
   put('jForm', [seatOk, cur && cur.id, st, S.criteria, S.settings.scale, S.settings.decimals, mine, me.seat], () => formHTML(cur, st, mine, seatOk));
   updateTotal();
   put('jHist', [S.contestants, S.scores, S.criteria, S.settings, S.status, me.seat, S.current], () => `
-    <h3>我的評分紀錄</h3><div class="tablewrap"><table><thead><tr><th>#</th><th>選手</th><th>曲目</th><th>狀態</th><th class="num">我的總分</th></tr></thead><tbody>
+    <h3>我的評分紀錄・${esc(rName())}</h3><div class="tablewrap"><table><thead><tr><th>#</th><th>選手</th><th>曲目</th><th>狀態</th><th class="num">我的總分</th></tr></thead><tbody>
     ${S.contestants.map((c, i) => `<tr class="${c.id === S.current ? 'cur' : ''}"><td>${i + 1}</td><td>${esc(c.name)}</td><td>${esc(c.song)}</td>
       <td><span class="chip ${stOf(c.id)}">${ST_LABEL[stOf(c.id)]}</span></td><td class="num">${fmt(judgeTotal((S.scores[c.id] || {})[me.seat]))}</td></tr>`).join('')
       || '<tr><td colspan="5" class="muted">尚無選手</td></tr>'}</tbody></table></div>`);
@@ -515,9 +744,10 @@ function setCrit(t) {
 }
 
 /* ---------- 管理員 ---------- */
-const TABS = [['control', '比賽控制'], ['contestants', '選手與曲目'], ['judges', '評審與裝置'], ['settings', '計分設定'], ['results', '成績排名'], ['data', '資料備份']];
+const TABS = [['control', '比賽控制'], ['stage', '大螢幕導播'], ['rounds', '賽程與晉級'], ['contestants', '選手與曲目'], ['judges', '評審與裝置'], ['settings', '計分設定'], ['results', '成績排名'], ['data', '資料備份']];
 const ASKEL = {
   control: `<div class="grid2"><section class="card" id="cNow"></section><section class="card" id="cJudges"></section></div><section class="card" id="cQueue" style="margin-top:16px"></section>`,
+  rounds: `<section class="card" id="rdFlow"></section><div id="rdCards"></div>`,
   contestants: `<section class="card" id="ctList"></section><section class="card" id="ctImport" style="margin-top:16px"></section>`,
   judges: `<div class="grid2"><section class="card" id="jdSeats"></section><section class="card" id="jdDev"></section></div>`,
   settings: `<div class="grid2"><section class="card" id="stBasic"></section><section class="card" id="stCrit"></section></div>`,
@@ -535,9 +765,11 @@ const AV = {};
 AV.control = () => {
   const cur = cById(S.current), st = cur ? stOf(cur.id) : 'wait', i = idx(S.current), n = S.contestants.length;
   const done = S.contestants.filter(c => stOf(c.id) === 'locked').length;
-  const dm = S.display.mode || 'current';
-  put('cNow', [cur, st, i, n, done, dm], () => `
-    <div class="row between"><h3>目前選手</h3><span class="muted small">進度：已完成 ${done} / ${n} 位</span></div>
+  const dm = S.display.scene;
+  const nx = nextRid(S.round), nxN = nx ? R(nx).contestants.length : 0, rDone = roundDone(S.round), adv = +R().advance || 0;
+  put('cNow', [cur, st, i, n, done, dm, S.round, S.roundIds.map(rName), nxN, rDone, adv], () => `
+    ${rDone ? `<div class="banner-ok">🎉 ${esc(rName())}已全部完成！${adv ? (nxN ? `${esc(rName(nx))}名單已產生（${nxN} 位）<button class="sm" data-act="rdActive" data-r="${nx}">切換到${esc(rName(nx))}</button>` : `<button class="sm pri" data-act="advance" data-r="${S.round}">產生晉級名單</button>`) : '這是最終賽次，可到「成績排名」查看最終名次。'}</div>` : ''}
+    <div class="row between"><div class="row"><h3 style="margin:0">目前選手</h3><span class="chip open">🏁 ${esc(rName())}</span></div><span class="muted small">進度：已完成 ${done} / ${n} 位</span></div>
     <div class="bar"><i style="width:${n ? done / n * 100 : 0}%"></i></div>
     ${cur ? `<div class="stage mini"><div class="row"><span class="chip ${st}">${ST_LABEL[st]}</span><span class="muted small">第 ${i + 1} 位</span>${cur.group ? `<span class="chip">${esc(cur.group)}</span>` : ''}</div>
         <div class="cname">${esc(cur.name || '（未填姓名）')}</div><div class="song">🎵 ${esc(cur.song || '（未填曲目）')}</div>${cur.artist ? `<div class="muted small">${esc(cur.artist)}</div>` : ''}</div>`
@@ -548,9 +780,9 @@ AV.control = () => {
       <button class="pri" data-act="setst" data-st="locked" ${!cur || st === 'locked' ? 'disabled' : ''}>🔒 鎖定分數</button>
       <button class="ghost" data-act="setst" data-st="wait" ${!cur || st === 'wait' ? 'disabled' : ''}>設回待評分</button>
     </div>
-    <div class="row"><span class="muted small">大螢幕顯示：</span><div class="seg">
-      ${[['current', '目前選手'], ['score', '選手成績'], ['results', '排行榜']].map(([k, l]) => `<button class="${dm === k ? 'act' : ''}" data-act="disp" data-m="${k}">${l}</button>`).join('')}
-    </div></div>`);
+    <div class="row"><span class="muted small">大螢幕快速切換：</span><div class="seg">
+      ${[['current', '目前選手'], ['score', '選手成績'], ['board', '排行榜'], ['qualify', '晉級名單'], ['poster', '海報']].map(([k, l]) => `<button class="${dm === k ? 'act' : ''}" data-act="goLive" data-s="${k}">${l}</button>`).join('')}
+    </div><button class="ghost sm" data-act="tab" data-tab="stage">導播台 →</button></div>`);
 
   put('cJudges', [S.judges, clients, cur && cur.id, cur ? S.scores[cur.id] : null, S.criteria, S.settings], () => `
     <h3>評審即時狀態</h3><div class="jgrid">${S.judges.map((j, k) => {
@@ -573,21 +805,94 @@ AV.control = () => {
     }).join('') || '<tr><td colspan="8" class="muted">尚無選手</td></tr>'}</tbody></table></div>`);
 };
 
+let ctRid = sessionStorage.getItem('sc_ctrid') || '', resRid = '', gsScope = 'round';
+const roundSeg = (act, sel) => `<div class="seg">${S.roundIds.map(id => `<button class="${id === sel ? 'act' : ''}" data-act="${act}" data-r="${id}">${esc(rName(id))}${id === S.round ? ' ●' : ''}</button>`).join('')}</div>`;
+const allGroups = () => [...new Set([...GROUP_PRESETS, ...S.roundIds.flatMap(id => R(id).contestants.map(c => c.group)).filter(Boolean)])];
 AV.contestants = () => {
-  put('ctList', [S.contestants, S.status], () => `
-    <div class="row between"><h3>選手與曲目（共 ${S.contestants.length} 位，依出場順序）</h3>
-      <div class="row"><button data-act="ctAdd">＋ 新增選手</button>${S.contestants.length ? '' : '<button class="ghost" data-act="ctSample">載入範例資料</button>'}</div></div>
-    <div class="tablewrap"><table class="edit"><thead><tr><th>#</th><th>姓名</th><th>組別</th><th>演唱曲目</th><th>原唱／備註</th><th></th></tr></thead><tbody>
-    ${S.contestants.map((c, i) => `<tr class="${c.id === S.current ? 'cur' : ''}"><td>${i + 1}</td>
-      ${['name', 'group', 'song', 'artist'].map(f => `<td><input id="ct_${c.id}_${f}" data-ct="${c.id}" data-f="${f}" value="${esc(c[f])}"></td>`).join('')}
-      <td class="nowrap"><button class="ghost sm" data-act="ctMove" data-id="${c.id}" data-d="-1" ${i === 0 ? 'disabled' : ''}>↑</button><button class="ghost sm" data-act="ctMove" data-id="${c.id}" data-d="1" ${i === S.contestants.length - 1 ? 'disabled' : ''}>↓</button> <button class="bad sm" data-act="ctDel" data-id="${c.id}">刪除</button></td></tr>`).join('')
-      || '<tr><td colspan="6" class="muted">尚無選手，請新增或使用下方批次匯入</td></tr>'}
-    </tbody></table></div><p class="muted small">修改欄位後點到別處即自動儲存，所有電腦會同步更新。</p>`, true);
-  put('ctImport', ['static'], () => `
-    <h3>批次匯入</h3><p class="muted small">每行一位：<b>姓名, 演唱曲目, 原唱/備註, 組別</b>（逗號或 Tab 分隔，可直接從 Excel 複製貼上）</p>
-    <textarea id="impText" rows="6" placeholder="王小明, 小幸運, 田馥甄, 青年組&#10;林怡君, 魚仔, 盧廣仲, 社會組"></textarea>
-    <div class="row" style="margin-top:10px"><button class="pri" data-act="ctImport">加入名單</button></div>`);
+  if (!S.rounds[ctRid]) ctRid = S.round;
+  const rd = R(ctRid), list = rd.contestants, first = S.roundIds.indexOf(ctRid) === 0;
+  put('ctList', [ctRid, list, S.status, S.round, rd.current, S.roundIds.map(rName), allGroups()], () => `
+    <div class="row between"><div class="row"><h3 style="margin:0">選手與曲目</h3>${roundSeg('ctRound', ctRid)}</div>
+      <div class="row"><button data-act="ctAdd">＋ 新增${esc(rd.name)}選手</button>${list.length || !first ? '' : '<button class="ghost" data-act="ctSample">載入範例資料</button>'}</div></div>
+    <p class="muted small" style="margin:10px 0">${esc(rd.name)}共 ${list.length} 位，依出場順序排列（● 為進行中的賽次）。${first ? '' : '此名單通常由上一賽次「產生晉級名單」自動建立，也可以手動調整。'}</p>
+    <datalist id="groupList">${allGroups().map(g => `<option value="${esc(g)}">`).join('')}</datalist>
+    <div class="tablewrap"><table class="edit"><thead><tr><th>#</th><th>姓名／團名</th><th>組別</th><th>演唱曲目</th><th>原唱／備註</th><th></th></tr></thead><tbody>
+    ${list.map((c, i) => `<tr class="${c.id === rd.current && ctRid === S.round ? 'cur' : ''}"><td>${i + 1}</td>
+      ${['name', 'group', 'song', 'artist'].map(f => `<td><input id="ct_${c.id}_${f}" data-ct="${c.id}" data-f="${f}" value="${esc(c[f])}" ${f === 'group' ? 'list="groupList"' : ''} ${f === 'song' && !c.song && c.from ? `placeholder="${esc('上一賽次：' + ((prevRid(ctRid) && (R(prevRid(ctRid)).contestants.find(x => x.id === c.from) || {}).song) || ''))}"` : ''}></td>`).join('')}
+      <td class="nowrap"><button class="ghost sm" data-act="ctMove" data-id="${c.id}" data-d="-1" ${i === 0 ? 'disabled' : ''}>↑</button><button class="ghost sm" data-act="ctMove" data-id="${c.id}" data-d="1" ${i === list.length - 1 ? 'disabled' : ''}>↓</button> <button class="bad sm" data-act="ctDel" data-id="${c.id}">刪除</button></td></tr>`).join('')
+      || `<tr><td colspan="6" class="muted">${first ? '尚無選手，請新增或使用下方批次匯入' : '尚無名單。上一賽次完成後，到「賽程與晉級」產生晉級名單即可'}</td></tr>`}
+    </tbody></table></div><p class="muted small">修改欄位後點到別處即自動儲存，所有電腦會同步更新。組別可直接選「個人組」「團體組」，也能自行輸入。</p>`, true);
+  put('ctImport', [ctRid, rName(ctRid)], () => `
+    <h3>批次匯入到「${esc(rName(ctRid))}」</h3><p class="muted small">每行一位：<b>姓名, 演唱曲目, 原唱/備註, 組別</b>（逗號或 Tab 分隔，可直接從 Excel 複製貼上）</p>
+    <textarea id="impText" rows="6" placeholder="王小明, 小幸運, 田馥甄, 個人組&#10;好聲音合唱團, 稻香, 周杰倫, 團體組"></textarea>
+    <div class="row" style="margin-top:10px"><button class="pri" data-act="ctImport">加入名單</button></div>`, true);
 };
+
+/* ---------- 賽程與晉級 ---------- */
+function qualifyPreview(rid) {
+  const r = R(rid), q = new Set(qualifiers(rid).map(x => x.c.id)), n = +r.advance || 0;
+  const groups = r.advMode === 'group' ? [...new Set(r.contestants.map(c => c.group || ''))] : [null];
+  return groups.map(g => {
+    const { rows, scored } = g === null ? rankRound(rid, '') : rankRound(rid, g, true);
+    const qn = scored.filter(x => q.has(x.c.id)).length, tie = qn > n;
+    return `<div class="qp"><div class="row between"><b>${g === null ? '總排名' : esc(g || '未分組')}</b><span class="small muted">取前 ${n} 名・目前晉級 ${qn} 位${tie ? '<span class="warn">（含同分）</span>' : ''}・未評分 ${rows.length - scored.length} 位</span></div>
+      <div class="qp-list">${scored.map(x => `<div class="qp-row ${q.has(x.c.id) ? 'in' : ''}"><span class="qp-rk">${x.rank}</span><span class="qp-nm">${esc(x.c.name)}</span><span class="qp-sc">${fmt(x.f)}</span><span class="qp-tag">${q.has(x.c.id) ? '✓ 晉級' : ''}</span></div>`).join('') || '<div class="muted small" style="padding:8px">尚無成績</div>'}</div></div>`;
+  }).join('');
+}
+AV.rounds = () => {
+  const ids = S.roundIds;
+  put('rdFlow', [ids, ids.map(id => [rName(id), R(id).contestants.length, R(id).contestants.filter(c => stOf(c.id) === 'locked').length]), S.round], () => `
+    <div class="row between"><h3 style="margin:0">賽程</h3><button data-act="rdAdd">＋ 新增賽次</button></div>
+    <div class="flow">${ids.map((id, i) => { const l = R(id).contestants, d = l.filter(c => stOf(c.id) === 'locked').length;
+      return `${i ? '<span class="flow-ar">→</span>' : ''}<div class="flow-it ${id === S.round ? 'on' : ''}"><div class="flow-n">${esc(rName(id))}${id === S.round ? '<span class="chip open">進行中</span>' : ''}</div><div class="small muted">${l.length} 位・已完成 ${d}/${l.length}</div></div>`; }).join('')}</div>
+    <p class="muted small" style="margin:12px 0 0">每個賽次有自己的名單、曲目與分數。上一賽次完成後，系統會依晉級規則自動產生下一賽次名單。</p>`);
+  put('rdCards', [ids, ids.map(id => R(id)), S.scores, S.status, S.round, S.judges, S.criteria, S.settings], () => ids.map((id, i) => {
+    const r = R(id), nx = nextRid(id), nxName = nx ? rName(nx) : (ROUND_NAMES[i + 1] || `第 ${i + 2} 輪`), l = r.contestants, d = l.filter(c => stOf(c.id) === 'locked').length;
+    const nxList = nx ? R(nx).contestants.length : 0, adv = +r.advance || 0;
+    return `<section class="card rd ${id === S.round ? 'on' : ''}" style="margin-top:16px">
+      <div class="row between"><div class="row"><span class="rd-no">${i + 1}</span><input class="rd-name" id="rdn_${id}" data-rd="${id}" data-f="name" value="${esc(r.name)}">
+        ${id === S.round ? '<span class="chip open">● 進行中</span>' : `<button class="sm" data-act="rdActive" data-r="${id}">設為進行中</button>`}</div>
+        <div class="row"><span class="muted small">名單 ${l.length} 位・已完成 ${d}/${l.length}</span>${i > 0 ? `<button class="bad sm" data-act="rdDel" data-r="${id}">刪除賽次</button>` : ''}</div></div>
+      <div class="rd-set">
+        <label class="lbl">晉級名額<input type="number" min="0" id="rda_${id}" data-rd="${id}" data-f="advance" value="${adv}"><span class="small">0 = 最終賽次，不晉級</span></label>
+        <label class="lbl">晉級方式<select data-rd="${id}" data-f="advMode"><option value="group" ${r.advMode === 'group' ? 'selected' : ''}>各組別各取前 N 名</option><option value="overall" ${r.advMode === 'overall' ? 'selected' : ''}>不分組，總排名取前 N 名</option></select></label>
+        <label class="lbl">下一賽次出場順序<select data-rd="${id}" data-f="advOrder"><option value="reverse" ${r.advOrder === 'reverse' ? 'selected' : ''}>成績低者先唱（高分壓軸）</option><option value="rank" ${r.advOrder === 'rank' ? 'selected' : ''}>成績高者先唱</option><option value="original" ${r.advOrder === 'original' ? 'selected' : ''}>維持本賽次順序</option></select></label>
+        ${i > 0 ? `<label class="lbl">加計${esc(rName(prevRid(id)))}成績<input type="number" min="0" max="100" id="rdc_${id}" data-rd="${id}" data-f="carry" value="${+r.carry || 0}"><span class="small">%（0 = 只看本賽次）</span></label>` : '<div></div>'}
+      </div>
+      <div class="row">${ck2(id, 'auto', r.auto, '本賽次全部鎖定後，自動產生晉級名單')}${ck2(id, 'keepSong', r.keepSong, '晉級者沿用本賽次曲目')}</div>
+      ${adv ? `<div class="qp-wrap">${qualifyPreview(id)}</div>
+        <div class="row" style="margin-top:14px"><button class="pri" data-act="advance" data-r="${id}">產生晉級名單 → ${esc(nxName)}</button>
+          ${nxList ? `<span class="okc small">✓ ${esc(nxName)}名單已產生（${nxList} 位）</span>${nx !== S.round ? `<button class="sm" data-act="rdActive" data-r="${nx}">切換到${esc(nxName)}開始比賽</button>` : ''}` : `<span class="muted small">${roundDone(id) ? '本賽次已全部完成，可以產生名單' : `本賽次尚有 ${l.length - d} 位未完成`}</span>`}</div>`
+        : '<p class="muted small" style="margin:6px 0 0">這是最終賽次，「成績排名」即為最後名次。</p>'}
+    </section>`;
+  }).join(''), true);
+};
+const ck2 = (rid, f, val, label) => `<label class="ck"><input type="checkbox" data-rd="${rid}" data-f="${f}" ${val ? 'checked' : ''}> ${label}</label>`;
+async function doAdvance(rid, auto) {
+  const r = R(rid), q = qualifiers(rid);
+  if (!(+r.advance > 0)) { toast('請先設定晉級名額'); return; }
+  if (!q.length) { if (!auto) toast('還沒有成績，無法產生晉級名單'); return; }
+  let nid = nextRid(rid), nextName;
+  const ops = [];
+  if (!nid) {
+    nid = 'r' + uid().slice(0, 6); const ids = [...S.roundIds]; ids.splice(ids.indexOf(rid) + 1, 0, nid);
+    const nr = ROUND_DEFAULT(ids.indexOf(nid)); nextName = nr.name;
+    ops.push({ op: 'set', path: ['roundIds'], value: ids }, { op: 'set', path: ['rounds', nid], value: nr });
+  } else {
+    nextName = rName(nid);
+    if (hasScores(nid)) { if (!auto) alert(`${nextName}已經開始評分，不能重新產生名單。\n如需重來，請先到「資料備份」清除${nextName}的分數。`); return; }
+    if (!auto && R(nid).contestants.length && !confirm(`${nextName}已有 ${R(nid).contestants.length} 位名單，要用最新成績重新產生嗎？`)) return;
+  }
+  const gOrder = [...new Set(r.contestants.map(c => c.group || ''))];
+  const list = [...q].sort((a, b) => {
+    const g = r.advMode === 'group' ? gOrder.indexOf(a.c.group || '') - gOrder.indexOf(b.c.group || '') : 0;
+    if (g) return g;
+    return r.advOrder === 'reverse' ? a.f - b.f : r.advOrder === 'rank' ? b.f - a.f : a.i - b.i;
+  });
+  const entries = list.map(x => { const id = uid(); return { id, pid: x.c.pid, name: x.c.name, group: x.c.group || '', song: r.keepSong ? x.c.song || '' : '', artist: r.keepSong ? x.c.artist || '' : '', from: x.c.id }; });
+  ops.push({ op: 'set', path: ['rounds', nid, 'contestants'], value: entries }, { op: 'set', path: ['rounds', nid, 'current'], value: null });
+  if (await send(ops)) toast(`${auto ? '本賽次已全部完成，已自動' : '已'}產生${nextName}名單：${entries.length} 位晉級`);
+}
 
 AV.judges = () => {
   put('jdSeats', [S.judges, S.scores], () => `
@@ -633,50 +938,327 @@ AV.settings = () => {
 };
 
 AV.results = () => {
-  const groups = [...new Set(S.contestants.map(c => c.group).filter(Boolean))];
+  if (!S.rounds[resRid]) resRid = S.round;
+  const rd = R(resRid), groups = [...new Set(rd.contestants.map(c => c.group).filter(Boolean))], carry = +rd.carry > 0 && prevRid(resRid);
   if (resGroup && !groups.includes(resGroup)) resGroup = '';
-  put('rsTable', [S.contestants, S.scores, S.judges, S.criteria, S.settings, S.status, resSort, resGroup], () => {
-    const { rows, scored } = ranking(resGroup);
-    const list = resSort === 'rank' ? [...scored, ...rows.filter(x => x.r.avg == null)] : rows;
-    return `<div class="row between"><h3>成績排名</h3><div class="row">
+  put('rsTable', [resRid, rd, S.scores, S.judges, S.criteria, S.settings, S.status, resSort, resGroup, S.round, S.roundIds.map(rName)], () => {
+    const { rows, scored } = rankRound(resRid, resGroup), q = new Set(qualifiers(resRid).map(x => x.c.id)), adv = +rd.advance > 0;
+    const list = resSort === 'rank' ? [...scored, ...rows.filter(x => x.f == null)] : rows;
+    const pr = prevRid(resRid);
+    return `<div class="row between"><div class="row"><h3 style="margin:0">成績排名</h3>${roundSeg('resRound', resRid)}</div><div class="row">
         ${groups.length ? `<select id="resGroup" style="width:auto"><option value="">全部組別</option>${groups.map(g => `<option ${g === resGroup ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select>` : ''}
         <div class="seg"><button class="${resSort === 'rank' ? 'act' : ''}" data-act="resSort" data-v="rank">依名次</button><button class="${resSort === 'order' ? 'act' : ''}" data-act="resSort" data-v="order">依出場序</button></div>
         <button data-act="csv">匯出 Excel (CSV)</button></div></div>
-      <div class="tablewrap"><table><thead><tr><th>名次</th><th>#</th><th>姓名</th><th>組別</th><th>曲目</th>${S.judges.map(j => `<th class="num">${esc(j.name)}</th>`).join('')}<th class="num">平均</th><th>狀態</th></tr></thead><tbody>
+      ${carry ? `<p class="muted small">總成績 = ${esc(rd.name)}平均 × ${100 - rd.carry}% ＋ ${esc(rName(pr))}成績 × ${rd.carry}%</p>` : ''}
+      <div class="tablewrap" style="margin-top:10px"><table><thead><tr><th>名次</th><th>#</th><th>姓名</th><th>組別</th><th>曲目</th>${S.judges.map(j => `<th class="num">${esc(j.name)}</th>`).join('')}<th class="num">${carry ? '本賽次平均' : '平均'}</th>${carry ? '<th class="num">總成績</th>' : ''}${adv ? '<th>晉級</th>' : ''}<th>狀態</th></tr></thead><tbody>
       ${list.map(x => `<tr><td><b>${x.rank ?? '—'}</b></td><td>${x.i + 1}</td><td>${esc(x.c.name)}</td><td>${esc(x.c.group)}</td><td>${esc(x.c.song)}</td>
-        ${x.r.per.map(v => `<td class="num">${fmt(v)}</td>`).join('')}<td class="num"><b>${fmt(x.r.avg)}</b></td><td><span class="chip ${stOf(x.c.id)}">${ST_LABEL[stOf(x.c.id)]}</span></td></tr>`).join('')
-        || `<tr><td colspan="${7 + S.judges.length}" class="muted">尚無資料</td></tr>`}</tbody></table></div>`;
+        ${x.r.per.map(v => `<td class="num">${fmt(v)}</td>`).join('')}<td class="num">${carry ? fmt(x.r.avg) : `<b>${fmt(x.f)}</b>`}</td>${carry ? `<td class="num"><b>${fmt(x.f)}</b></td>` : ''}
+        ${adv ? `<td>${q.has(x.c.id) ? '<span class="chip open">✓ 晉級</span>' : ''}</td>` : ''}<td><span class="chip ${stOf(x.c.id)}">${ST_LABEL[stOf(x.c.id)]}</span></td></tr>`).join('')
+        || `<tr><td colspan="${9 + S.judges.length}" class="muted">尚無資料</td></tr>`}</tbody></table></div>`;
   });
 };
 
-AV.data = () => put('dtBox', [mode], () => `
+AV.data = () => put('dtBox', [mode, S.roundIds.map(id => [rName(id), R(id).contestants.map(c => c.group)]), S.round], () => `
   <h3>資料備份與重設</h3>
   ${mode === 'server' ? '<div class="infobox">伺服器會即時把資料存到 <b>data.json</b>，並每 3 分鐘備份到 <b>backups/</b> 資料夾；伺服器重開也會自動載回。</div>'
     : mode === 'gist' ? '<div class="infobox">資料存在你的 GitHub Gist。每次修改都會留下一個版本，萬一誤刪，可到 Gist 頁面的 <b>Revisions</b> 找回舊版本。</div>'
     : '<div class="warnbox">單機模式的資料存在這台電腦的瀏覽器裡，建議定期匯出備份。</div>'}
+  <p class="muted small">JSON 備份包含比賽資料與大螢幕設定，但不含圖片檔本身；請自行保留海報原檔。</p>
   <div class="row"><button data-act="exportJson">⬇ 匯出完整備份 (JSON)</button><label class="row" style="cursor:pointer"><span class="chip">⬆ 匯入備份</span><input type="file" id="impFile" accept=".json,application/json" hidden></label></div>
-  <div class="row" style="margin-top:24px"><button class="bad" data-act="clearScores">清除所有分數（保留選手與設定）</button><button class="bad" data-act="resetAll">全部重設</button></div>`);
+  <hr>
+  <h3>依組別重置</h3>
+  <p class="muted small">例如只重來「團體組」，不影響個人組。清除名單時，該組選手的分數也會一起刪除。</p>
+  <div class="row" style="margin-bottom:12px"><span class="small muted">範圍：</span><select id="gsScope" style="width:auto"><option value="round">只限進行中的賽次（${esc(rName())}）</option><option value="all" ${gsScope === 'all' ? 'selected' : ''}>全部賽次</option></select></div>
+  <div class="grp-grid">${[...new Set([...GROUP_PRESETS, ...S.roundIds.flatMap(id => R(id).contestants.map(c => c.group || ''))])].map(g => {
+    const n = S.roundIds.reduce((a, id) => a + R(id).contestants.filter(c => (c.group || '') === g).length, 0);
+    return `<div class="grp"><b>${esc(g || '未分組')}</b><span class="small muted">全部賽次共 ${n} 筆</span><div class="row" style="margin-top:8px"><button class="bad sm" data-act="grpReset" data-g="${esc(g)}" data-w="scores">清除分數</button><button class="bad sm" data-act="grpReset" data-g="${esc(g)}" data-w="list">清除名單</button></div></div>`;
+  }).join('')}</div>
+  <hr>
+  <h3>全部重置</h3>
+  <div class="row"><button class="bad" data-act="clearScores">清除所有分數（保留選手與設定）</button><button class="bad" data-act="resetAll">全部重設</button></div>`);
 
-/* ---------- 大螢幕 ---------- */
-SKEL.display = () => `<div class="disp" id="dsp"></div>`;
-VIEW.display = () => {
-  const cur = cById(S.current), st = cur ? stOf(cur.id) : 'wait', m = S.display.mode || 'current';
-  const key = m === 'results' ? [m, S.contestants, S.scores, S.judges, S.criteria, S.settings]
-    : [m, cur, st, idx(S.current), S.judges, cur ? S.scores[cur.id] : null, S.criteria, S.settings];
-  put('dsp', key, () => {
-    if (m === 'results') {
-      const { scored } = ranking('');
-      return `<div class="d-res"><h2>🏆 ${esc(S.settings.title)}・成績排行</h2>${scored.slice(0, 10).map(x => `<div class="r ${x.rank === 1 ? 't1' : ''}"><span class="rk">${x.rank}</span><span>${esc(x.c.name)} <span class="muted" style="font-size:.7em">${esc(x.c.song)}</span></span><span class="sc">${fmt(x.r.avg)}</span></div>`).join('') || '<div class="muted">尚無成績</div>'}</div>`;
+/* ---------- 素材（海報、背景、Logo） ---------- */
+let assetVer = 0;
+const assetCache = new Map();
+function assetSrc(id) {
+  const v = assetCache.get(id);
+  if (v && v.startsWith('data:')) return v;
+  if (v === undefined) {
+    assetCache.set(id, 'loading');
+    loadAsset(id).then(d => { assetCache.set(id, d); assetVer++; render(); })
+      .catch(() => { assetCache.set(id, 'error'); setTimeout(() => { assetCache.delete(id); assetVer++; render(); }, 8000); });
+  }
+  return '';
+}
+const idbOpen = () => new Promise((res, rej) => { const r = indexedDB.open('sc_assets', 1); r.onupgradeneeded = () => r.result.createObjectStore('a'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+async function idbOp(fn, m) { const db = await idbOpen(); return new Promise((res, rej) => { const tx = db.transaction('a', m); const q = fn(tx.objectStore('a')); tx.oncomplete = () => res(q && q.result); tx.onerror = () => rej(tx.error); }); }
+const idbGet = id => idbOp(s => s.get(id), 'readonly').then(v => { if (!v) throw new Error('missing'); return v; });
+const idbPut = (id, d) => idbOp(s => s.put(d, id), 'readwrite');
+const idbDel = id => idbOp(s => s.delete(id), 'readwrite');
+
+// 雲端模式：圖片放在另一個自動建立的 secret Gist，避免每次同步都下載大圖
+let gA = { gid: null, files: null, p: null };
+async function gAssetGist(create) {
+  let gid = S.settings.assetGist;
+  if (gid || !create) return gid;
+  if (!GIST.token) throw new Error('需要 GitHub 權杖');
+  const r = await fetch('https://api.github.com/gists', { method: 'POST', headers: gHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ description: `${S.settings.title}・大螢幕素材（評分系統自動建立）`, public: false, files: { 'README.md': { content: '這個 Gist 由歌唱比賽評分系統自動建立，用來存放大螢幕的海報與圖片，請勿手動修改。' } } }) });
+  if (!r.ok) throw new Error(gErrMsg(r.status));
+  gid = (await r.json()).id;
+  if (!await gSend([{ op: 'set', path: ['settings', 'assetGist'], value: gid }])) throw new Error('無法記錄素材 Gist');
+  return gid;
+}
+function gAssetFiles(gid, force) {
+  if (!force && gA.gid === gid && gA.files) return Promise.resolve(gA.files);
+  if (gA.p && gA.gid === gid) return gA.p;
+  gA.gid = gid;
+  gA.p = fetch(GAPI + gid, { cache: 'no-store', headers: gHeaders() })
+    .then(r => { if (!r.ok) throw new Error(gErrMsg(r.status)); return r.json(); })
+    .then(g => { gA.files = g.files || {}; gA.p = null; return gA.files; })
+    .catch(e => { gA.p = null; throw e; });
+  return gA.p;
+}
+async function gAssetGet(id) {
+  const gid = S.settings.assetGist; if (!gid) throw new Error('no asset gist');
+  const name = `asset-${id}.txt`;
+  let files = await gAssetFiles(gid), f = files[name];
+  if (!f) { files = await gAssetFiles(gid, true); f = files[name]; }
+  if (!f) throw new Error('missing');
+  if (!f.truncated && f.content) return f.content;
+  const r = await fetch(f.raw_url, { cache: 'no-store' }); if (!r.ok) throw new Error('raw');
+  return r.text();
+}
+async function gAssetWrite(id, data) {
+  const gid = await gAssetGist(data != null);
+  if (!gid) return;
+  const name = `asset-${id}.txt`;
+  const r = await fetch(GAPI + gid, { method: 'PATCH', headers: gHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ files: { [name]: data == null ? null : { content: data } } }) });
+  if (!r.ok) throw new Error(gErrMsg(r.status));
+  if (gA.gid === gid && gA.files) { if (data == null) delete gA.files[name]; else gA.files[name] = { content: data }; }
+}
+async function loadAsset(id) {
+  if (mode === 'gist') return gAssetGet(id);
+  if (mode === 'server') { const r = await fetch('/api/asset/' + id); if (!r.ok) throw new Error('missing'); return r.text(); }
+  return idbGet(id);
+}
+async function saveAsset(id, data) {
+  if (mode === 'gist') return gAssetWrite(id, data);
+  if (mode === 'server') {
+    const r = await fetch('/api/asset', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id, data, pin: sessionStorage.getItem('sc_pin') || '' }) });
+    if (r.status === 403) throw new Error('管理員 PIN 錯誤'); if (!r.ok) throw new Error('伺服器錯誤 ' + r.status); return;
+  }
+  return idbPut(id, data);
+}
+function deleteAssetData(id) {
+  if (mode === 'gist') return gAssetWrite(id, null);
+  if (mode === 'server') return fetch('/api/asset', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id, delete: true, pin: sessionStorage.getItem('sc_pin') || '' }) });
+  return idbDel(id);
+}
+// 自動壓縮成適合投影的大小（最長邊 1920px、約 900KB 以內）
+async function compressImage(file) {
+  const url = URL.createObjectURL(file);
+  const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('無法讀取圖片')); i.src = url; });
+  URL.revokeObjectURL(url);
+  const W = im.naturalWidth || 1600, H = im.naturalHeight || 900, alpha = /png|webp|gif|svg/.test(file.type);
+  let max = 1920, q = 0.86, out = '', w = W, h = H;
+  for (let t = 0; t < 7; t++) {
+    const sc = Math.min(1, max / Math.max(W, H)); w = Math.max(1, Math.round(W * sc)); h = Math.max(1, Math.round(H * sc));
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d');
+    if (!alpha) { x.fillStyle = '#000'; x.fillRect(0, 0, w, h); }
+    x.drawImage(im, 0, 0, w, h);
+    out = c.toDataURL('image/webp', q);
+    if (!out.startsWith('data:image/webp')) out = alpha ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', q);
+    if (out.length <= 900000) break;
+    max = Math.round(max * 0.82); q = Math.max(0.6, q - 0.07);
+  }
+  return { data: out, w, h };
+}
+async function uploadAssets(files) {
+  const added = [];
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) { toast(f.name + ' 不是圖片檔'); continue; }
+    try {
+      toast(`處理中：${f.name}`);
+      const { data, w, h } = await compressImage(f), id = uid();
+      await saveAsset(id, data); assetCache.set(id, data);
+      added.push({ id, name: f.name, w, h, size: data.length, at: Date.now() });
+    } catch (e) { toast(`上傳失敗：${f.name}（${e.message || e}）`); }
+  }
+  if (added.length && await send([{ op: 'set', path: ['assets'], value: [...S.assets, ...added] }])) toast(`已上傳 ${added.length} 張圖片`);
+}
+
+/* ---------- 大螢幕畫面引擎（大螢幕、導播台預覽與播出監看共用） ---------- */
+const SCENES = [['standby', '待機畫面', '◎'], ['poster', '海報', '▣'], ['current', '目前選手', '♪'], ['score', '選手成績', '★'], ['board', '排行榜', '♛'], ['lineup', '出場順序', '☰'], ['qualify', '晉級名單', '➚'], ['message', '自訂訊息', '✎'], ['black', '黑畫面', '■']];
+const sceneName = k => (SCENES.find(s => s[0] === k) || [0, k])[1];
+const THEMES = [['gold', '金色舞台'], ['blue', '科技藍'], ['red', '典禮紅'], ['light', '簡約白']];
+const MSG_PRESETS = [['Intermission', '中場休息', '比賽將於 15 分鐘後繼續'], ['Please wait', '成績統計中', '評審正在進行最後確認，請稍候'], ['Coming up', '比賽即將開始', '請觀眾就座，並將手機調為靜音'], ['Awards', '頒獎典禮', '恭喜所有得獎者'], ['Thank you', '感謝您的蒞臨', '我們明年見']];
+const pad2 = n => String(n).padStart(2, '0');
+const screenSkel = pf => `<div class="scr" id="${pf}"><div class="scr-bg" id="${pf}Bg"></div><div class="scr-head" id="${pf}Head"></div><div class="scr-body" id="${pf}Body"></div><div class="scr-tick" id="${pf}Tick"></div></div>`;
+function img(id, cls) { const s = id ? assetSrc(id) : ''; return s ? `<img${cls ? ` class="${cls}"` : ''} src="${s}" alt="">` : ''; }
+
+function paintScreen(pf, d) {
+  const root = document.getElementById(pf); if (!root) return;
+  const clean = d.scene === 'black' || (d.scene === 'poster' && d.poster.clean);
+  root.className = `scr th-${d.theme}${clean ? ' clean' : ''}${d.scene === 'black' ? ' black' : ''}`;
+  put(pf + 'Bg', [d.bg, d.bgDim, assetVer], () => `<div class="glow"></div>${d.bg ? img(d.bg) + `<div class="dim" style="opacity:${(+d.bgDim || 0) / 100}"></div>` : ''}`);
+  put(pf + 'Head', [d.header, d.logo, S.settings.title, assetVer], () => !d.header.on ? '' :
+    `<div class="hd-l">${d.logo.on ? img(d.logo.id) : ''}<span>${esc(d.header.left || S.settings.title)}</span></div><div class="hd-r">${esc(d.header.right)}</div>`);
+  const live = ['current', 'score', 'board', 'lineup', 'qualify'].includes(d.scene);
+  const prevHide = root._hide; root._hide = d.board.hide;
+  const changed = root._scene !== d.scene; root._scene = d.scene;
+  put(pf + 'Body', [d.scene, d.scene === 'message' ? d.msg : d[d.scene], live ? [S.round, S.roundIds.map(id => R(id)), S.scores, S.status, S.judges, S.criteria, S.settings] : [S.settings.title], d.logo, assetVer], () => sceneHTML(d, prevHide));
+  if (changed) { const b = document.getElementById(pf + 'Body'); b.classList.remove('anim'); void b.offsetWidth; b.classList.add('anim'); clearTimeout(b._t); b._t = setTimeout(() => b.classList.remove('anim'), 2500); }
+  put(pf + 'Tick', [d.ticker], () => d.ticker.on && d.ticker.text ? `<div class="tk-label">${esc(d.ticker.label || '最新消息')}</div><div class="tk-track"><span style="animation-duration:${Math.max(12, d.ticker.text.length * ({ slow: .5, normal: .34, fast: .22 }[d.ticker.speed] || .34) + 8)}s">${esc(d.ticker.text)}</span></div>` : '');
+}
+function standbyHTML(d, sub) {
+  const logo = d.logo.on && d.logo.id ? img(d.logo.id, 'st-logo') : '';
+  sub = sub || d.standby.sub;
+  return `<div class="sc-center">${logo}<div class="eyebrow">${esc(d.standby.label || 'Welcome')}</div><h1 class="big-title">${esc(S.settings.title)}</h1>${sub ? `<div class="subt">${esc(sub)}</div>` : ''}<div class="rule"></div></div>`;
+}
+function sceneHTML(d, prevHide) {
+  const cur = cById(S.current), i = idx(S.current);
+  switch (d.scene) {
+    case 'black': return '';
+    case 'poster': {
+      const s = d.poster.id ? assetSrc(d.poster.id) : '';
+      return `<div class="sc-poster ${d.poster.fit}">${s ? `${d.poster.fit === 'contain' ? `<img class="blur" src="${s}" alt="">` : ''}<img class="main" src="${s}" alt="">` : `<div class="ph">${d.poster.id ? '海報載入中…' : '尚未選擇海報'}</div>`}</div>`;
     }
-    if (!cur) return `<div><div class="d-name">${esc(S.settings.title)}</div><div class="d-artist">比賽即將開始</div></div>`;
-    const r = result(cur.id);
-    const bottom = m === 'score'
-      ? (st === 'locked' ? `<div class="d-score"><span>平均得分</span>${fmt(r.avg)}</div>` : `<div class="d-judges">成績統計中…</div>`)
-      : `<div class="d-judges">${S.judges.map(j => { const ok = (S.scores[cur.id] || {})[j.id]; return `<span class="${ok ? 'ok' : ''}">${esc(j.name)} ${ok ? '✓' : '…'}</span>`; }).join('')}</div>`;
-    return `<div><div class="d-label">第 ${idx(cur.id) + 1} 位參賽者${cur.group ? '・' + esc(cur.group) : ''}</div>
-      <div class="d-name">${esc(cur.name)}</div>
-      <div class="d-song"><span>演唱曲目</span>${esc(cur.song || '')}</div>${cur.artist ? `<div class="d-artist">${esc(cur.artist)}</div>` : ''}${bottom}</div>`;
-  });
+    case 'message':
+      return `<div class="sc-center">${d.msg.label ? `<div class="eyebrow">${esc(d.msg.label)}</div>` : ''}<h1 class="big-title">${esc(d.msg.title)}</h1>${d.msg.sub ? `<div class="subt">${esc(d.msg.sub)}</div>` : ''}<div class="rule"></div></div>`;
+    case 'current': {
+      if (!cur) return standbyHTML(d, '比賽即將開始');
+      return `<div class="sc-current"><div class="eyebrow">Now on stage<span class="cur-tag">${esc(rName())}・第 ${i + 1} 位${cur.group ? '・' + esc(cur.group) : ''}</span></div>
+        <div class="cur-grid"><div class="cur-no">${pad2(i + 1)}</div><div class="cur-info"><div class="cur-name">${esc(cur.name)}</div>
+        ${cur.song ? `<div class="cur-song"><span class="note">♪</span><span>${esc(cur.song)}</span></div>` : ''}${cur.artist ? `<div class="cur-artist">${esc(cur.artist)}</div>` : ''}</div></div>
+        ${d.current.progress ? `<div class="jprog">${S.judges.map(j => `<div class="jp ${(S.scores[cur.id] || {})[j.id] ? 'ok' : ''}"><i></i><span>${esc(j.name)}</span></div>`).join('')}</div>` : ''}</div>`;
+    }
+    case 'score': {
+      if (!cur) return standbyHTML(d, '比賽即將開始');
+      const r = result(cur.id), st = stOf(cur.id), fin = finalScore(S.round, cur), carry = +R().carry > 0 && prevRid(S.round);
+      return `<div class="sc-score"><div class="eyebrow">Result・${esc(rName())}・第 ${i + 1} 位</div><div class="sc-name">${esc(cur.name)}</div>${cur.song ? `<div class="sc-song">♪ ${esc(cur.song)}</div>` : ''}
+        ${st === 'locked' && r.avg != null
+          ? `<div class="sc-val">${fmt(r.avg)}<small> / ${scale()}</small></div>${carry && fin != null ? `<div class="sc-carry">加計${esc(rName(prevRid(S.round)))}成績後　總成績 <b>${fmt(fin)}</b></div>` : ''}${d.score.detail ? `<div class="sc-det">${S.judges.map((j, k) => `<div><span>${esc(j.name)}</span><b>${fmt(r.per[k])}</b></div>`).join('')}</div>` : ''}`
+          : `<div class="sc-wait"><span class="spin"></span>評審評分中　${r.n} / ${S.judges.length}</div>`}</div>`;
+    }
+    case 'board': {
+      const b = d.board, brid = S.rounds[b.rid] ? b.rid : S.round, { scored } = rankRound(brid, b.group), list = b.top ? scored.slice(0, b.top) : scored;
+      if (!list.length) return `<div class="sc-center"><div class="eyebrow">Ranking</div><h1 class="big-title">成績統計中</h1><div class="rule"></div></div>`;
+      const n = list.length, two = n > 10, cls = two ? 'two dense' : n > 6 ? 'dense' : '';
+      return `<div class="sc-board"><div class="eyebrow">Ranking</div><h2>${esc(rName(brid))}・${b.group ? esc(b.group) + '・' : ''}成績排行榜</h2>
+        <div class="bd-list ${cls}" ${two ? `style="grid-template-rows:repeat(${Math.ceil(n / 2)},auto)"` : ''}>${list.map((x, k) => {
+          const m = x.rank <= b.hide, rv = !m && prevHide != null && x.rank <= prevHide && x.rank > b.hide;
+          return `<div class="bd-row ${x.rank <= 3 ? 'r' + x.rank : ''} ${m ? 'masked' : ''} ${rv ? 'reveal' : ''}" style="animation-delay:${rv ? 0 : (k * 0.07).toFixed(2)}s">
+            <div class="bd-rk">${x.rank}</div><div class="bd-nm">${m ? '？ ？ ？' : esc(x.c.name)}${b.song && !m ? `<small>${esc(x.c.song || '')}</small>` : ''}</div><div class="bd-sc">${m ? '— —' : fmt(x.r.avg)}</div></div>`;
+        }).join('')}</div></div>`;
+    }
+    case 'lineup': {
+      const cnt = d.lineup.count || 8, start = Math.max(0, Math.min(i < 0 ? 0 : i - 1, S.contestants.length - cnt)), list = S.contestants.slice(start, start + cnt);
+      if (!list.length) return standbyHTML(d);
+      return `<div class="sc-lineup"><div class="eyebrow">Running order</div><h2>${esc(rName())}出場順序</h2><div class="lu-list">${list.map((c, k) => {
+        const j = start + k, cls = j === i ? 'now' : (j < i || stOf(c.id) === 'locked') ? 'done' : j === i + 1 ? 'next' : '';
+        return `<div class="lu-row ${cls}"><span class="lu-no">${pad2(j + 1)}</span><span class="lu-nm">${esc(c.name)}</span><span class="lu-song">${c.song ? '♪ ' + esc(c.song) : ''}</span><span class="lu-st">${{ now: '演唱中', done: '已完成', next: '下一位' }[cls] || ''}</span></div>`;
+      }).join('')}</div></div>`;
+    }
+    case 'qualify': {
+      const qid = S.rounds[d.qualify.rid] ? d.qualify.rid : (S.roundIds.indexOf(S.round) > 0 && R().contestants.length ? S.round : nextRid(S.round));
+      const list = qid ? R(qid).contestants : [];
+      if (!list.length) return `<div class="sc-center"><div class="eyebrow">Qualified</div><h1 class="big-title">晉級名單即將公布</h1><div class="rule"></div></div>`;
+      const groups = [...new Set(list.map(c => c.group || ''))], n = list.length, cols = n > 12 ? 4 : n > 6 ? 3 : 2;
+      return `<div class="sc-qual"><div class="eyebrow">Congratulations</div><h2>晉級${esc(rName(qid))}名單</h2>
+        ${groups.map(g => `<div class="qg">${groups.length > 1 || g ? `<div class="qg-h">${esc(g || '未分組')}<span>${list.filter(c => (c.group || '') === g).length} 位</span></div>` : ''}
+          <div class="qg-list" style="grid-template-columns:repeat(${cols},1fr)">${list.filter(c => (c.group || '') === g).map((c, k) => `<div class="qg-it" style="animation-delay:${(k * 0.06).toFixed(2)}s"><span>${pad2(list.indexOf(c) + 1)}</span><b>${esc(c.name)}</b>${d.qualify.song && c.song ? `<small>♪ ${esc(c.song)}</small>` : ''}</div>`).join('')}</div></div>`).join('')}</div>`;
+    }
+    default: return standbyHTML(d);
+  }
+}
+
+SKEL.display = () => `<div class="dwrap idle" id="dwrap">${screenSkel('dsp')}<div class="dctl" id="dctl"></div></div>`;
+VIEW.display = () => {
+  paintScreen('dsp', S.display);
+  put('dctl', [online, mode], () => `<span class="dot ${online ? 'on' : ''}" title="${online ? '同步中' : '連線中斷'}"></span><button class="sm" data-act="fs">⛶ 全螢幕</button><button class="sm" data-act="switch">切換身分</button>`);
+};
+let idleT;
+document.addEventListener('mousemove', () => { const w = $('#dwrap'); if (!w) return; w.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => w.classList.add('idle'), 2500); });
+
+/* ---------- 管理員：大螢幕導播台 ---------- */
+let pv = null, autoTake = sessionStorage.getItem('sc_autotake') === '1', takeT;
+function afterPv() { render(); if (autoTake) { clearTimeout(takeT); takeT = setTimeout(() => ACT.take(), 600); } }
+function setPv(path, val) { const ks = path.split('.'); let o = pv; for (let i = 0; i < ks.length - 1; i++) o = o[ks[i]]; o[ks[ks.length - 1]] = val; afterPv(); }
+ASKEL.stage = `<div class="sw-mons">
+    <div class="mon"><div class="mon-h"><span class="tag pv">PREVIEW 預覽</span><span id="pvName"></span></div>${screenSkel('pvw')}</div>
+    <div class="sw-take"><button class="take" data-act="take">TAKE<small>播出</small></button>
+      <label class="small row" style="gap:6px;cursor:pointer"><input type="checkbox" id="autoTake" style="width:auto"> 直接播出</label>
+      <button class="ghost sm" data-act="pvReset" title="把預覽還原成目前播出的內容">↺ 還原預覽</button></div>
+    <div class="mon pg"><div class="mon-h"><span class="tag pg">● ON AIR 播出中</span><span id="pgName"></span></div>${screenSkel('pgm')}</div>
+  </div>
+  <section class="card" id="swScenes"></section>
+  <div class="grid2" style="margin-top:16px"><section class="card" id="swScene"></section><section class="card" id="swGlobal"></section></div>
+  <section class="card" id="swAssets" style="margin-top:16px"></section>`;
+const ck = (path, val, label) => `<label class="ck"><input type="checkbox" data-pv="${path}" ${val ? 'checked' : ''}> ${label}</label>`;
+const tx = (path, val, label, ph) => `<label class="lbl">${label}<input data-pv="${path}" value="${esc(val)}" placeholder="${esc(ph || '')}"></label>`;
+const sl = (path, val, label, opts, num) => `<label class="lbl">${label}<select data-pv="${path}" ${num ? 'data-pvt="num"' : ''}>${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(val ?? '') ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>`;
+const sg = (path, val, opts) => `<div class="seg">${opts.map(([v, l]) => `<button class="${val === v ? 'act' : ''}" data-act="pvSet" data-k="${path}" data-v='${JSON.stringify(v)}'>${l}</button>`).join('')}</div>`;
+function assetPicker(path, val, none) {
+  return `<div class="apick">${none ? `<button class="ap ${!val ? 'on' : ''}" data-act="pvSet" data-k="${path}" data-v="null"><span>無</span></button>` : ''}${S.assets.map(a => `<button class="ap ${val === a.id ? 'on' : ''}" data-act="pvSet" data-k="${path}" data-v='"${a.id}"' title="${esc(a.name)}">${img(a.id) || '<span>載入中</span>'}</button>`).join('')}${S.assets.length ? '' : '<span class="muted small">素材庫還沒有圖片，請到下方上傳</span>'}</div>`;
+}
+function sceneSettings(p) {
+  const h = `<h3>場景設定：${sceneName(p.scene)}</h3>`;
+  switch (p.scene) {
+    case 'standby': return h + tx('standby.label', p.standby.label, '上方小標（英文效果較好）', 'WELCOME') + tx('standby.sub', p.standby.sub, '副標題（例如日期、地點）', '2026／11／15・市民活動中心') + '<p class="muted small">主標題使用「計分設定」中的比賽名稱；在右側開啟 Logo 後，會顯示在標題上方。</p>';
+    case 'poster': return h + '<div class="lbl">選擇海報</div>' + assetPicker('poster.id', p.poster.id) + `<div class="row" style="margin-top:14px">${sg('poster.fit', p.poster.fit, [['contain', '完整顯示'], ['cover', '滿版裁切']])}${ck('poster.clean', p.poster.clean, '純海報（隱藏標題列與跑馬燈）')}</div>`;
+    case 'current': return h + ck('current.progress', p.current.progress, '顯示評審送分進度') + '<p class="muted small">內容自動跟隨「比賽控制」的目前選手，切換下一位時大螢幕會同步更新。</p>';
+    case 'score': return h + ck('score.detail', p.score.detail, '顯示各評審分數') + '<p class="muted small">管理員按下「鎖定分數」後才會揭曉成績，在那之前顯示評分進度。</p>';
+    case 'board': {
+      const groups = [...new Set(S.contestants.map(c => c.group).filter(Boolean))], hide = S.display.board.hide, live = S.display.scene === 'board';
+      return h + sl('board.rid', p.board.rid, '賽次', [['', `進行中的賽次（${rName()}）`], ...S.roundIds.map(id => [id, rName(id)])]) + `<div class="grid2" style="gap:12px">${sl('board.group', p.board.group, '組別', [['', '全部組別'], ...groups.map(g => [g, g])])}${sl('board.top', p.board.top, '顯示名次', [[3, '前 3 名'], [5, '前 5 名'], [8, '前 8 名'], [10, '前 10 名'], [0, '全部']], true)}</div>
+        ${ck('board.song', p.board.song, '顯示演唱曲目')}
+        <div class="reveal-box"><b>🏆 名次揭曉</b><p class="muted small">先遮住前三名，再從第 3 名開始一名一名揭曉。這裡的按鈕會直接作用在大螢幕上。</p>
+        <div class="row"><button data-act="reveal" data-v="3">遮住前 3 名</button><button class="pri" data-act="reveal" data-v="-1" ${hide > 0 ? '' : 'disabled'}>揭曉下一名${hide > 0 ? `（第 ${hide} 名）` : ''}</button><button class="ghost" data-act="reveal" data-v="0">全部顯示</button></div>
+        ${live ? '' : '<p class="warn small" style="margin:10px 0 0">大螢幕目前不在排行榜，請先按 TAKE 播出排行榜。</p>'}</div>`;
+    }
+    case 'lineup': return h + sl('lineup.count', p.lineup.count, '顯示筆數', [[5, '5 位'], [6, '6 位'], [8, '8 位'], [10, '10 位']], true) + '<p class="muted small">從目前選手的前一位開始列出，並自動標示「演唱中／下一位／已完成」。</p>';
+    case 'message': return h + `<div class="lbl">快速套用</div><div class="row" style="margin-bottom:14px">${MSG_PRESETS.map((m, k) => `<button class="sm" data-act="preset" data-i="${k}">${m[1]}</button>`).join('')}</div>` + tx('msg.label', p.msg.label, '上方小標（英文效果較好）', 'INTERMISSION') + tx('msg.title', p.msg.title, '主標題') + tx('msg.sub', p.msg.sub, '副標題');
+    case 'qualify': return h + sl('qualify.rid', p.qualify.rid, '顯示哪個賽次的晉級名單', [['', '自動（進行中賽次，或其下一賽次）'], ...S.roundIds.slice(1).map(id => [id, '晉級' + rName(id)])]) + ck('qualify.song', p.qualify.song, '顯示演唱曲目') + '<p class="muted small">名單來自「賽程與晉級」產生的下一賽次名單，依出場順序排列並分組顯示。</p>';
+    case 'black': return h + '<p class="muted">整個大螢幕切成黑畫面，適合換場或播放影片前使用。</p>';
+  }
+  return h;
+}
+function globalSettings(p) {
+  return `<h3>整體外觀</h3>
+    <div class="lbl">配色主題</div>${sg('theme', p.theme, THEMES)}
+    <div class="lbl" style="margin-top:16px">背景圖片</div>${assetPicker('bg', p.bg, true)}
+    ${p.bg ? `<label class="lbl" style="margin-top:10px">背景暗化 ${p.bgDim}%（數字越大文字越清楚）<input type="range" min="0" max="95" step="5" data-pv="bgDim" data-pvt="num" value="${p.bgDim}"></label>` : ''}
+    <hr>
+    <div class="row between"><b>標題列</b>${ck('header.on', p.header.on, '顯示')}</div>
+    <div class="grid2" style="gap:12px;margin-top:10px">${tx('header.left', p.header.left, '左側文字', S.settings.title)}${tx('header.right', p.header.right, '右側文字', '主辦單位／日期')}</div>
+    <div class="row between"><span class="lbl" style="margin:0">Logo（顯示在標題列與待機畫面）</span>${ck('logo.on', p.logo.on, '顯示 Logo')}</div>${assetPicker('logo.id', p.logo.id, true)}
+    <hr>
+    <div class="row between"><b>跑馬燈</b>${ck('ticker.on', p.ticker.on, '顯示')}</div>
+    <div class="grid2" style="gap:12px;margin-top:10px">${tx('ticker.label', p.ticker.label, '標籤', '最新消息')}${sl('ticker.speed', p.ticker.speed, '捲動速度', [['slow', '慢'], ['normal', '中'], ['fast', '快']])}</div>
+    <label class="lbl">內容<textarea data-pv="ticker.text" rows="2" placeholder="例如：下一位參賽者請至後台準備・現場請勿使用閃光燈">${esc(p.ticker.text)}</textarea></label>`;
+}
+function assetsHTML() {
+  const uses = id => { const d = S.display, out = []; if (d.poster.id === id || (pv && pv.poster.id === id)) out.push('海報'); if (d.bg === id || (pv && pv.bg === id)) out.push('背景'); if (d.logo.id === id || (pv && pv.logo.id === id)) out.push('Logo'); return out; };
+  return `<div class="row between"><h3>素材庫（海報・背景・Logo）</h3><label class="btnlike">⬆ 上傳圖片<input type="file" id="assetFile" accept="image/*" multiple hidden></label></div>
+    <p class="muted small">支援 JPG／PNG／WebP，可一次選多張。系統會自動壓縮成適合投影的大小（最長邊 1920px），海報建議使用 16:9 橫式。${mode === 'gist' ? '雲端模式下，圖片存放在系統自動建立的另一個 secret Gist。' : ''}</p>
+    <div class="assets">${S.assets.map(a => { const u = uses(a.id); return `<div class="asset ${u.length ? 'on' : ''}"><div class="th">${img(a.id) || '載入中…'}</div>
+      <div class="meta"><div class="nm" title="${esc(a.name)}">${esc(a.name)}</div><div class="muted">${a.w}×${a.h}・${Math.round(a.size * 0.75 / 1024)} KB${u.length ? `・<span class="okc">${u.join('、')}</span>` : ''}</div></div>
+      <div class="acts"><button data-act="assetUse" data-u="poster" data-id="${a.id}">當海報</button><button data-act="assetUse" data-u="bg" data-id="${a.id}">當背景</button><button data-act="assetUse" data-u="logo" data-id="${a.id}">當 Logo</button><button class="bad" data-act="assetDel" data-id="${a.id}">刪除</button></div></div>`; }).join('')
+      || '<div class="empty" style="grid-column:1/-1">還沒有素材，請上傳活動海報或 Logo</div>'}</div>`;
+}
+AV.stage = () => {
+  if (!pv) pv = clone(S.display);
+  paintScreen('pvw', pv); paintScreen('pgm', S.display);
+  put('pvName', [pv.scene], () => sceneName(pv.scene));
+  put('pgName', [S.display.scene], () => sceneName(S.display.scene));
+  const cb = $('#autoTake'); if (cb) cb.checked = autoTake;
+  const tk = $('.take'); if (tk) tk.classList.toggle('same', JSON.stringify(pv) === JSON.stringify(S.display));
+  put('swScenes', [pv.scene, S.display.scene], () => `<div class="row between"><h3 style="margin:0">場景</h3><span class="muted small">點選場景放到「預覽」，確認後按 TAKE 播出</span></div>
+    <div class="scenes">${SCENES.map(([k, l, ic]) => `<button class="scene ${pv.scene === k ? 'sel' : ''} ${S.display.scene === k ? 'live' : ''}" data-act="scene" data-s="${k}"><span class="ic">${ic}</span>${l}</button>`).join('')}</div>`);
+  put('swScene', [pv.scene, pv.scene === 'message' ? pv.msg : pv[pv.scene], S.assets, assetVer, S.contestants.map(c => c.group), S.round, S.roundIds.map(rName), S.display.board.hide, S.display.scene], () => sceneSettings(pv), true);
+  put('swGlobal', [pv.theme, pv.bg, pv.bgDim, pv.header, pv.ticker, pv.logo, S.assets, assetVer, S.settings.title], () => globalSettings(pv), true);
+  put('swAssets', [S.assets, assetVer, pv.poster.id, pv.bg, pv.logo, S.display.poster.id, S.display.bg, S.display.logo, mode], assetsHTML);
 };
 
 /* ================= 互動事件 ================= */
@@ -716,9 +1298,27 @@ const ACT = {
   setst(b) {
     const cid = S.current; if (!cid) return; const v = b.dataset.st;
     if (v === 'locked') { const r = result(cid); if (r.n < S.judges.length && !confirm(`還有 ${S.judges.length - r.n} 位評審尚未送出分數，確定要鎖定嗎？`)) return; }
-    send([v === 'wait' ? { op: 'del', path: ['status', cid] } : { op: 'set', path: ['status', cid], value: v }]);
+    const rid = S.round, r = R(rid);
+    const willFinish = v === 'locked' && r.auto && +r.advance > 0 && r.contestants.every(c => c.id === cid || stOf(c.id) === 'locked');
+    send([v === 'wait' ? { op: 'del', path: ['status', cid] } : { op: 'set', path: ['status', cid], value: v }]).then(ok => { if (ok && willFinish) doAdvance(rid, true); });
   },
-  disp(b) { send([{ op: 'set', path: ['display', 'mode'], value: b.dataset.m }]); },
+  goLive(b) { const k = b.dataset.s; if (pv) pv.scene = k; send([{ op: 'set', path: ['display', 'scene'], value: k }]); },
+  scene(b) { setPv('scene', b.dataset.s); },
+  pvSet(b) { setPv(b.dataset.k, JSON.parse(b.dataset.v)); },
+  take() { if (!pv) return; clearTimeout(takeT); send([{ op: 'set', path: ['display'], value: clone(pv) }]).then(ok => ok && !autoTake && toast('已播出：' + sceneName(pv.scene))); },
+  pvReset() { pv = clone(S.display); render(); },
+  reveal(b) { const v = +b.dataset.v, nv = v < 0 ? Math.max(0, S.display.board.hide - 1) : v; if (pv) pv.board.hide = nv; send([{ op: 'set', path: ['display', 'board', 'hide'], value: nv }]); },
+  preset(b) { const m = MSG_PRESETS[+b.dataset.i]; pv.msg = { label: m[0], title: m[1], sub: m[2] }; afterPv(); },
+  assetUse(b) { const id = b.dataset.id, u = b.dataset.u; if (u === 'poster') { pv.poster.id = id; pv.scene = 'poster'; } else if (u === 'bg') pv.bg = id; else pv.logo = { id, on: true }; afterPv(); if (!autoTake) toast('已放到預覽，按 TAKE 播出'); },
+  async assetDel(b) {
+    const id = b.dataset.id; if (!confirm('確定刪除這張圖片？')) return;
+    const d = S.display, ops = [{ op: 'set', path: ['assets'], value: S.assets.filter(a => a.id !== id) }];
+    if (d.poster.id === id) ops.push({ op: 'set', path: ['display', 'poster', 'id'], value: null });
+    if (d.bg === id) ops.push({ op: 'set', path: ['display', 'bg'], value: null });
+    if (d.logo.id === id) ops.push({ op: 'set', path: ['display', 'logo', 'id'], value: null });
+    if (pv) { if (pv.poster.id === id) pv.poster.id = null; if (pv.bg === id) pv.bg = null; if (pv.logo.id === id) pv.logo.id = null; }
+    if (await send(ops)) { deleteAssetData(id).catch(() => {}); assetCache.delete(id); toast('已刪除'); }
+  },
   async submit() {
     const cid = S.current; if (!cid || stOf(cid) !== 'open') return;
     const src = drafts[dk(cid)] || baseDraft(cid);
@@ -728,24 +1328,37 @@ const ACT = {
     const val = { items, comment: ($('#jCmt') ? $('#jCmt').value : '').trim(), at: Date.now(), by: me.label };
     if (await send([{ op: 'set', path: ['scores', cid, me.seat], value: val }])) { delete drafts[dk(cid)]; saveDrafts(); toast('分數已送出 ✓'); }
   },
-  ctAdd() { const id = uid(); pendingFocus = `ct_${id}_name`; send([{ op: 'set', path: ['contestants'], value: [...S.contestants, { id, name: '', group: '', song: '', artist: '' }] }]); },
-  ctDel(b) {
-    const c = cById(b.dataset.id); const has = S.scores[c.id] && Object.keys(S.scores[c.id]).length;
-    if (!confirm(`確定刪除「${c.name || '未命名'}」？${has ? '\n（該選手的評分也會一併刪除）' : ''}`)) return;
-    const ops = [{ op: 'set', path: ['contestants'], value: S.contestants.filter(x => x.id !== c.id) }, { op: 'del', path: ['scores', c.id] }, { op: 'del', path: ['status', c.id] }];
-    if (S.current === c.id) ops.push({ op: 'set', path: ['current'], value: null });
+  advance(b) { doAdvance(b.dataset.r, false); },
+  rdActive(b) { const id = b.dataset.r; if (!confirm(`切換到「${rName(id)}」？評審畫面與大螢幕都會跟著切換。`)) return; send([{ op: 'set', path: ['round'], value: id }]).then(ok => ok && toast(`已切換到${rName(id)}`)); },
+  rdAdd() { const id = 'r' + uid().slice(0, 6), ids = [...S.roundIds, id]; send([{ op: 'set', path: ['roundIds'], value: ids }, { op: 'set', path: ['rounds', id], value: ROUND_DEFAULT(ids.length - 1) }]); },
+  rdDel(b) {
+    const id = b.dataset.r, r = R(id); if (S.roundIds.length <= 1) return;
+    if (!confirm(`確定刪除「${r.name}」？這個賽次的名單與 ${r.contestants.filter(c => S.scores[c.id]).length} 筆評分都會一併刪除。`)) return;
+    const ops = [{ op: 'set', path: ['roundIds'], value: S.roundIds.filter(x => x !== id) }, { op: 'del', path: ['rounds', id] }];
+    r.contestants.forEach(c => ops.push({ op: 'del', path: ['scores', c.id] }, { op: 'del', path: ['status', c.id] }));
+    if (S.round === id) ops.push({ op: 'set', path: ['round'], value: S.roundIds[0] });
     send(ops);
   },
-  ctMove(b) { const list = clone(S.contestants), i = idx(b.dataset.id), j = i + +b.dataset.d; if (j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; send([{ op: 'set', path: ['contestants'], value: list }]); },
+  ctRound(b) { ctRid = b.dataset.r; sessionStorage.setItem('sc_ctrid', ctRid); render(); },
+  ctAdd() { const rid = ctRid || S.round, id = uid(); pendingFocus = `ct_${id}_name`; send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: [...R(rid).contestants, { id, pid: id, name: '', group: '', song: '', artist: '' }] }]); },
+  ctDel(b) {
+    const rid = ctRid || S.round, c = R(rid).contestants.find(x => x.id === b.dataset.id); if (!c) return;
+    const has = S.scores[c.id] && Object.keys(S.scores[c.id]).length;
+    if (!confirm(`確定從${rName(rid)}刪除「${c.name || '未命名'}」？${has ? '\n（該選手在本賽次的評分也會一併刪除）' : ''}`)) return;
+    const ops = [{ op: 'set', path: ['rounds', rid, 'contestants'], value: R(rid).contestants.filter(x => x.id !== c.id) }, { op: 'del', path: ['scores', c.id] }, { op: 'del', path: ['status', c.id] }];
+    if (R(rid).current === c.id) ops.push({ op: 'set', path: ['rounds', rid, 'current'], value: null });
+    send(ops);
+  },
+  ctMove(b) { const rid = ctRid || S.round, list = clone(R(rid).contestants), i = list.findIndex(x => x.id === b.dataset.id), j = i + +b.dataset.d; if (i < 0 || j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: list }]); },
   ctSample() {
-    const s = [['王小明', '小幸運', '田馥甄', '青年組'], ['林怡君', '魚仔', '盧廣仲', '青年組'], ['陳家豪', '告白氣球', '周杰倫', '社會組'], ['張雅婷', '突然好想你', '五月天', '社會組']];
-    send([{ op: 'set', path: ['contestants'], value: s.map(([name, song, artist, group]) => ({ id: uid(), name, song, artist, group })) }]);
+    const s = [['王小明', '小幸運', '田馥甄', '個人組'], ['林怡君', '魚仔', '盧廣仲', '個人組'], ['陳家豪', '告白氣球', '周杰倫', '個人組'], ['張雅婷', '突然好想你', '五月天', '個人組'], ['好聲音合唱團', '稻香', '周杰倫', '團體組'], ['南風三重唱', '小手拉大手', '梁靜茹', '團體組'], ['和聲小隊', '倔強', '五月天', '團體組']];
+    send([{ op: 'set', path: ['rounds', ctRid || S.round, 'contestants'], value: s.map(([name, song, artist, group]) => { const id = uid(); return { id, pid: id, name, song, artist, group }; }) }]);
   },
   ctImport() {
-    const t = $('#impText'); const lines = t.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const rid = ctRid || S.round, t = $('#impText'); const lines = t.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     if (!lines.length) { toast('請先貼上名單'); return; }
-    const add = lines.map(l => { const p = l.split(/\t|,|，/).map(x => x.trim()); return { id: uid(), name: p[0] || '', song: p[1] || '', artist: p[2] || '', group: p[3] || '' }; });
-    send([{ op: 'set', path: ['contestants'], value: [...S.contestants, ...add] }]).then(ok => { if (ok) { t.value = ''; toast(`已加入 ${add.length} 位選手`); } });
+    const add = lines.map(l => { const p = l.split(/\t|,|，/).map(x => x.trim()), id = uid(); return { id, pid: id, name: p[0] || '', song: p[1] || '', artist: p[2] || '', group: p[3] || '' }; });
+    send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: [...R(rid).contestants, ...add] }]).then(ok => { if (ok) { t.value = ''; toast(`已加入 ${add.length} 位選手到${rName(rid)}`); } });
   },
   scale(b) {
     const v = +b.dataset.v; if (v === scale()) return;
@@ -755,35 +1368,59 @@ const ACT = {
   crAdd() { const id = 'c' + uid().slice(0, 5); pendingFocus = `cr_${id}_name`; send([{ op: 'set', path: ['criteria'], value: [...S.criteria, { id, name: '新項目', weight: 0 }] }]); },
   crDel(b) { if (!confirm('確定刪除這個評分項目？')) return; send([{ op: 'set', path: ['criteria'], value: S.criteria.filter(c => c.id !== b.dataset.id) }]); },
   resSort(b) { resSort = b.dataset.v; render(); },
+  resRound(b) { resRid = b.dataset.r; render(); },
   csv() {
-    const { rows, scored } = ranking('');
+    const rid = S.rounds[resRid] ? resRid : S.round, rd = R(rid), { rows, scored } = rankRound(rid, ''), q = new Set(qualifiers(rid).map(x => x.c.id));
     const rk = new Map(scored.map(x => [x.c.id, x.rank]));
-    const head = ['名次', '出場序', '姓名', '組別', '曲目', '原唱/備註', ...S.judges.flatMap(j => [...S.criteria.map(c => `${j.name}-${c.name}`), `${j.name}-總分`, `${j.name}-評語`]), '平均', '狀態'];
+    const head = ['賽次', '名次', '出場序', '姓名', '組別', '曲目', '原唱/備註', ...S.judges.flatMap(j => [...S.criteria.map(c => `${j.name}-${c.name}`), `${j.name}-總分`, `${j.name}-評語`]), '本賽次平均', '總成績', '晉級', '狀態'];
     const data = rows.map(x => {
       const sc = S.scores[x.c.id] || {};
-      return [rk.get(x.c.id) ?? '', x.i + 1, x.c.name, x.c.group, x.c.song, x.c.artist,
+      return [rd.name, rk.get(x.c.id) ?? '', x.i + 1, x.c.name, x.c.group, x.c.song, x.c.artist,
         ...S.judges.flatMap(j => { const s = sc[j.id]; return [...S.criteria.map(c => s && s.items[c.id] != null ? fmtIn(s.items[c.id]) : ''), s ? fmt(judgeTotal(s)) : '', s ? s.comment || '' : '']; }),
-        x.r.avg == null ? '' : fmt(x.r.avg), ST_LABEL[stOf(x.c.id)]];
+        x.r.avg == null ? '' : fmt(x.r.avg), x.f == null ? '' : fmt(x.f), q.has(x.c.id) ? '晉級' : '', ST_LABEL[stOf(x.c.id)]];
     });
     const csv = '\ufeff' + [head, ...data].map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
-    download(csv, `${S.settings.title}-成績-${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv;charset=utf-8');
+    download(csv, `${S.settings.title}-${rd.name}-成績-${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv;charset=utf-8');
+  },
+  grpReset(b) {
+    const g = b.dataset.g, what = b.dataset.w, all = gsScope === 'all';
+    const rids = all ? S.roundIds : [S.round], label = g || '未分組';
+    const hit = rids.flatMap(id => R(id).contestants.filter(c => (c.group || '') === g).map(c => [id, c]));
+    if (!hit.length) { toast(`${all ? '' : rName() + '的'}「${label}」沒有資料`); return; }
+    const scope = all ? '全部賽次' : rName();
+    if (!confirm(what === 'list' ? `確定清除${scope}「${label}」的名單（${hit.length} 筆）？\n這些選手的分數也會一併刪除，無法復原。` : `確定清除${scope}「${label}」的所有分數（${hit.length} 筆）？\n名單會保留，狀態回到「待評分」。`)) return;
+    const ops = [];
+    hit.forEach(([, c]) => ops.push({ op: 'del', path: ['scores', c.id] }, { op: 'del', path: ['status', c.id] }));
+    if (what === 'list') rids.forEach(id => {
+      const r = R(id), keep = r.contestants.filter(c => (c.group || '') !== g);
+      if (keep.length !== r.contestants.length) { ops.push({ op: 'set', path: ['rounds', id, 'contestants'], value: keep }); if (r.current && !keep.some(c => c.id === r.current)) ops.push({ op: 'set', path: ['rounds', id, 'current'], value: null }); }
+    });
+    send(ops).then(ok => ok && toast(`已清除「${label}」的${what === 'list' ? '名單' : '分數'}`));
   },
   exportJson() { download(JSON.stringify(S, null, 2), `${S.settings.title}-備份-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '')}.json`, 'application/json'); },
-  clearScores() { if (!confirm('確定清除「所有」評分與評分狀態？此動作無法復原（建議先匯出備份）。')) return; send([{ op: 'set', path: ['scores'], value: {} }, { op: 'set', path: ['status'], value: {} }, { op: 'set', path: ['current'], value: null }]); },
+  clearScores() { if (!confirm('確定清除「所有」評分與評分狀態？此動作無法復原（建議先匯出備份）。')) return; send([{ op: 'set', path: ['scores'], value: {} }, { op: 'set', path: ['status'], value: {} }, ...S.roundIds.map(id => ({ op: 'set', path: ['rounds', id, 'current'], value: null }))]); },
   resetAll() { if (!confirm('確定全部重設？選手、評審、設定與分數都會清空（建議先匯出備份）。')) return; if (!confirm('再次確認：真的要全部重設嗎？')) return; send([{ op: 'replace', path: [], value: {} }]); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act](b, e); });
 document.addEventListener('input', e => {
   const t = e.target;
+  if (t.dataset.pv && pv) { setPv(t.dataset.pv, t.type === 'checkbox' ? t.checked : t.dataset.pvt === 'num' ? +t.value : t.value); return; }
   if (t.id === 'devLabel') { me.label = t.value.trim(); saveMe(); return; }
   if (t.dataset.crit) { setCrit(t); return; }
   if (t.id === 'jCmt' && S.current) { const k = dk(S.current); drafts[k] = drafts[k] || baseDraft(S.current); drafts[k].comment = t.value; saveDrafts(); updateTotal(); }
 });
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.dataset.pv) return;
+  if (t.id === 'assetFile' && t.files.length) { uploadAssets([...t.files]); t.value = ''; return; }
+  if (t.id === 'autoTake') { autoTake = t.checked; sessionStorage.setItem('sc_autotake', autoTake ? '1' : ''); if (autoTake) ACT.take(); render(); return; }
   if (t.id === 'devLabel') { reconnect(); render(); return; }
   if (t.dataset.crit) { if (t.type === 'number' && t.value !== '') { t.value = Math.max(0, Math.min(scale(), +t.value)); setCrit(t); } return; }
-  if (t.dataset.ct) { const list = clone(S.contestants), c = list.find(x => x.id === t.dataset.ct); if (!c) return; c[t.dataset.f] = t.value.trim(); send([{ op: 'set', path: ['contestants'], value: list }]); return; }
+  if (t.dataset.rd) {
+    const f = t.dataset.f, v = t.type === 'checkbox' ? t.checked : (f === 'advance' || f === 'carry') ? Math.max(0, Math.min(f === 'carry' ? 100 : 999, Math.round(+t.value || 0))) : (t.value.trim() || R(t.dataset.rd).name);
+    send([{ op: 'set', path: ['rounds', t.dataset.rd, f], value: v }]); return;
+  }
+  if (t.dataset.ct) { const rid = ctRid || S.round, list = clone(R(rid).contestants), c = list.find(x => x.id === t.dataset.ct); if (!c) return; c[t.dataset.f] = t.value.trim(); send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: list }]); return; }
   if (t.dataset.jd) { const list = clone(S.judges), j = list.find(x => x.id === t.dataset.jd); j.name = t.value.trim() || j.name; send([{ op: 'set', path: ['judges'], value: list }]); return; }
   if (t.dataset.cr) { const list = clone(S.criteria), c = list.find(x => x.id === t.dataset.cr); c[t.dataset.f] = t.dataset.f === 'weight' ? Math.max(0, +t.value || 0) : (t.value.trim() || c.name); send([{ op: 'set', path: ['criteria'], value: list }]); return; }
   if (t.dataset.set) { send([{ op: 'set', path: ['settings', t.dataset.set], value: t.dataset.set === 'decimals' ? +t.value : (t.value.trim() || '歌唱比賽') }]); return; }
@@ -793,6 +1430,7 @@ document.addEventListener('change', e => {
     while (list.length < n) { let k = 1; while (list.some(j => j.id === 's' + k)) k++; list.push({ id: 's' + k, name: '評審老師 ' + String.fromCharCode(65 + list.length) }); }
     send([{ op: 'set', path: ['judges'], value: list }]); return;
   }
+  if (t.id === 'gsScope') { gsScope = t.value; return; }
   if (t.id === 'resGroup') { resGroup = t.value; render(); return; }
   if (t.id === 'impFile' && t.files[0]) {
     const r = new FileReader();
