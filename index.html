@@ -245,6 +245,20 @@ hr{border:0;border-top:1px solid var(--line);margin:18px 0}
 
 
 /* ===== 賽程與晉級 ===== */
+.mem-cell{min-width:240px}.mem-cell .small{display:block;margin-top:3px}
+.members{color:var(--text);opacity:.85;margin:4px 0 2px;font-size:15px}
+.cur-mem{display:flex;flex-wrap:wrap;gap:.8cqw;margin-top:2.4cqh}
+.cur-mem span{font-size:1.6cqw;padding:.6cqh 1.3cqw;border-radius:99px;border:1px solid var(--sl);background:color-mix(in srgb,var(--st) 6%,transparent)}
+.th-star .cur-mem span{border-color:rgba(110,170,255,.45);background:rgba(22,32,118,.6)}
+
+.gtabs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 18px;padding:10px 12px;border-radius:14px;background:rgba(7,10,46,.55);border:1px solid var(--line)}
+.gt-l{font-size:13px;color:var(--mute);margin-right:4px}
+.gtabs>button:not(.ghost){border-radius:99px;padding:7px 16px;display:inline-flex;align-items:center;gap:8px;font-weight:700}
+.gtabs>button.act{background:linear-gradient(180deg,#FFEBB0,#F6C453 46%,#D7932A);color:#2a1700;border-color:#FFD978}
+.gcount{font-size:12px;min-width:22px;padding:1px 7px;border-radius:99px;background:rgba(7,10,46,.55);color:var(--text);text-align:center}
+.gtabs>button.act .gcount{background:rgba(42,23,0,.18);color:#2a1700}
+.gt-n{margin-left:auto}
+
 .quota{margin-top:14px;padding:14px;border-radius:12px;border:1px solid var(--line);background:rgba(7,10,46,.45)}
 .quota-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
 .qt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
@@ -434,7 +448,7 @@ const DEFAULT = () => ({
     { id: 'c4', name: '台風與表現', weight: 15 }
   ],
   judges: [{ id: 's1', name: '評審老師 A' }, { id: 's2', name: '評審老師 B' }, { id: 's3', name: '評審老師 C' }],
-  contestants: [], current: null, status: {}, scores: {}, assets: [], display: DISPLAY_DEFAULT()
+  groups: [...GROUP_PRESETS], teamGroups: ['團體組'], contestants: [], current: null, status: {}, scores: {}, assets: [], display: DISPLAY_DEFAULT()
 });
 function normalize(s) {
   s = (s && typeof s === 'object') ? s : {};
@@ -448,6 +462,9 @@ function normalize(s) {
   for (const k in dd) if (dd[k] && typeof dd[k] === 'object') disp[k] = Object.assign({}, dd[k], od[k] || {});
   delete disp.mode; if (disp.scene === 'score') disp.scene = 'current'; s.display = disp;
   if (!Array.isArray(s.assets)) s.assets = [];
+  if (!Array.isArray(s.groups)) s.groups = [...GROUP_PRESETS];
+  if (!Array.isArray(s.teamGroups)) s.teamGroups = ['團體組'];
+  s.groups = s.groups.filter((g, i, a) => typeof g === 'string' && g && a.indexOf(g) === i);
   // 賽次：每個賽次有自己的名單與目前選手；S.contestants / S.current 永遠指向「進行中」的賽次
   if (!s.rounds || typeof s.rounds !== 'object' || Array.isArray(s.rounds)) s.rounds = {};
   if (!Array.isArray(s.roundIds) || !s.roundIds.length) s.roundIds = [...new Set(['r1', 'r2', ...Object.keys(s.rounds)])];
@@ -469,7 +486,7 @@ let S = normalize({}), clients = [], meta = { requirePin: false };
 let mode = 'server', online = false, everConnected = false, es = null, bc = null;
 let drafts = LS.get('sc_drafts', {});
 let adminTab = sessionStorage.getItem('sc_tab') || 'control';
-let resSort = 'rank', resGroup = '', pendingFocus = null;
+let resSort = 'rank', pendingFocus = null;
 
 const scale = () => +S.settings.scale || 10;
 const stepOf = () => scale() === 10 ? 0.1 : 1;
@@ -525,7 +542,7 @@ function rankRound(rid, group, exact) {
 }
 const ranking = group => rankRound(S.round, group);
 // 晉級名單：依設定取總排名或各組前 N 名；卡在最後名額同分者一併晉級
-const groupsOf = r => { const g = [...new Set(r.contestants.map(c => c.group || ''))]; return g.length ? g : [...GROUP_PRESETS]; };
+const groupsOf = r => [...new Set([...S.groups, ...r.contestants.map(c => c.group || '')])];
 // 各組晉級名額：分組模式下每組可各自設定，沒設定時用預設名額
 const quotaOf = (r, g) => Math.max(0, r.advMode === 'group' && g !== null && r.advanceBy && r.advanceBy[g] != null ? +r.advanceBy[g] || 0 : +r.advance || 0);
 const isAdv = rid => { const r = R(rid); return r.advMode === 'group' ? groupsOf(r).some(g => quotaOf(r, g) > 0) : quotaOf(r, null) > 0; };
@@ -792,7 +809,7 @@ VIEW.judge = () => {
     if (!cur) return `<div class="empty">比賽尚未開始，請等待管理員選擇選手</div>`;
     const i = idx(cur.id);
     return `<div class="row"><span class="chip ${st}">${ST_LABEL[st]}</span><span class="chip">🏁 ${esc(rName())}</span><span class="muted small">第 ${i + 1} / ${S.contestants.length} 位</span>${cur.group ? `<span class="chip">${esc(cur.group)}</span>` : ''}</div>
-      <div class="big-no">${i + 1}</div><div class="cname">${esc(cur.name || '（未填姓名）')}</div>
+      <div class="big-no">${i + 1}</div><div class="cname">${esc(cur.name || '（未填姓名）')}</div>${memberList(cur).length ? `<div class="members">👥 ${esc(membersText(cur))}</div>` : ''}
       <div class="song">🎵 ${esc(cur.song || '（未填曲目）')}</div>${cur.artist ? `<div class="muted">原唱／備註：${esc(cur.artist)}</div>` : ''}`;
   });
   const mine = cur ? (S.scores[cur.id] || {})[me.seat] : null;
@@ -850,33 +867,40 @@ const TABS = [['control', '比賽控制'], ['stage', '大螢幕導播'], ['round
 const ASKEL = {
   control: `<div class="grid2"><section class="card" id="cNow"></section><section class="card" id="cJudges"></section></div><section class="card" id="cQueue" style="margin-top:16px"></section>`,
   rounds: `<section class="card" id="rdFlow"></section><div id="rdCards"></div>`,
-  contestants: `<section class="card" id="ctList"></section><section class="card" id="ctImport" style="margin-top:16px"></section>`,
+  contestants: `<section class="card" id="ctList"></section><div class="grid2" style="margin-top:16px"><section class="card" id="ctImport"></section><section class="card" id="ctGroups"></section></div>`,
   judges: `<div class="grid2"><section class="card" id="jdSeats"></section><section class="card" id="jdDev"></section></div>`,
   settings: `<div class="grid2"><section class="card" id="stBasic"></section><section class="card" id="stCrit"></section></div>`,
   results: `<section class="card" id="rsTable"></section>`,
   data: `<section class="card" id="dtBox"></section>`
 };
-SKEL.admin = () => `<nav class="tabs" id="aTabs"></nav><div id="aBody"></div>`;
+SKEL.admin = () => `<nav class="tabs" id="aTabs"></nav><div id="aGroups"></div><div id="aBody"></div>`;
 VIEW.admin = () => {
   put('aTabs', [adminTab], () => TABS.map(([k, l]) => `<button class="${k === adminTab ? 'act' : ''}" data-act="tab" data-tab="${k}">${l}</button>`).join(''));
+  if (aGroup && !allGroups().includes(aGroup)) aGroup = '';
+  const gt = ['control', 'rounds', 'contestants', 'results'].includes(adminTab);
+  put('aGroups', [gt, aGroup, allGroups(), S.round, S.contestants.map(c => c.group)], () => !gt ? '' : `<div class="gtabs"><span class="gt-l">組別</span>
+    ${[['', '全部'], ...allGroups().map(g => [g, g])].map(([g, l]) => `<button class="${aGroup === g ? 'act' : ''}" data-act="aGroup" data-g="${esc(g)}">${esc(l)}<span class="gcount">${S.contestants.filter(c => !g || (c.group || '') === g).length}</span></button>`).join('')}
+    <button class="ghost sm" data-act="grpAdd">＋ 新增組別</button><span class="muted small gt-n">數字為${esc(rName())}人數；切換後，比賽控制、晉級設定、名單與排名都只看這個組別</span></div>`);
   const b = $('#aBody'); if (b._tab !== adminTab) { b._tab = adminTab; b.innerHTML = ASKEL[adminTab]; }
   AV[adminTab]();
 };
 const AV = {};
 
 AV.control = () => {
-  const cur = cById(S.current), st = cur ? stOf(cur.id) : 'wait', i = idx(S.current), n = S.contestants.length;
-  const done = S.contestants.filter(c => stOf(c.id) === 'locked').length;
+  const cur = cById(S.current), st = cur ? stOf(cur.id) : 'wait', i = idx(S.current), vis = S.contestants.filter(inG), vi = vis.findIndex(c => c.id === S.current), n = vis.length;
+  const done = vis.filter(c => stOf(c.id) === 'locked').length, gDone = aGroup && n > 0 && done === n;
   const dm = S.display.scene;
   const nx = nextRid(S.round), nxN = nx ? R(nx).contestants.length : 0, rDone = roundDone(S.round), adv = isAdv(S.round);
-  put('cNow', [cur, st, i, n, done, dm, S.round, S.roundIds.map(rName), nxN, rDone, adv], () => `
+  put('cNow', [cur, st, i, vi, n, done, dm, S.round, S.roundIds.map(rName), nxN, rDone, adv, aGroup], () => `
     ${rDone ? `<div class="banner-ok">🎉 ${esc(rName())}已全部完成！${adv ? (nxN ? `${esc(rName(nx))}名單已產生（${nxN} 位）<button class="sm" data-act="rdActive" data-r="${nx}">切換到${esc(rName(nx))}</button>` : `<button class="sm pri" data-act="advance" data-r="${S.round}">產生晉級名單</button>`) : '這是最終賽次，可到「成績排名」查看最終名次。'}</div>` : ''}
-    <div class="row between"><div class="row"><h3 style="margin:0">目前選手</h3><span class="chip open">🏁 ${esc(rName())}</span></div><span class="muted small">進度：已完成 ${done} / ${n} 位</span></div>
+    ${!rDone && gDone ? `<div class="banner-ok">✓ ${esc(rName())}${esc(aGroup)}已全部完成，可以切換到其他組別繼續比賽。</div>` : ''}
+    <div class="row between"><div class="row"><h3 style="margin:0">目前選手</h3><span class="chip open">🏁 ${esc(rName())}</span>${aGroup ? `<span class="chip">${esc(aGroup)}</span>` : ''}</div><span class="muted small">${esc(gLabel())}進度：已完成 ${done} / ${n} 位</span></div>
     <div class="bar"><i style="width:${n ? done / n * 100 : 0}%"></i></div>
     ${cur ? `<div class="stage mini"><div class="row"><span class="chip ${st}">${ST_LABEL[st]}</span><span class="muted small">第 ${i + 1} 位</span>${cur.group ? `<span class="chip">${esc(cur.group)}</span>` : ''}</div>
-        <div class="cname">${esc(cur.name || '（未填姓名）')}</div><div class="song">🎵 ${esc(cur.song || '（未填曲目）')}</div>${cur.artist ? `<div class="muted small">${esc(cur.artist)}</div>` : ''}</div>`
-      : `<div class="empty">${n ? '尚未選擇選手，按「下一位」開始比賽' : '請先到「選手與曲目」新增選手'}</div>`}
-    <div class="row" style="margin-top:14px"><button data-act="prev" ${i <= 0 ? 'disabled' : ''}>◀ 上一位</button><button data-act="next" ${i >= n - 1 ? 'disabled' : ''}>${i < 0 ? '開始：第一位 ▶' : '下一位 ▶'}</button></div>
+        <div class="cname">${esc(cur.name || '（未填姓名）')}</div>${memberList(cur).length ? `<div class="members">👥 ${esc(membersText(cur))}</div>` : ''}<div class="song">🎵 ${esc(cur.song || '（未填曲目）')}</div>${cur.artist ? `<div class="muted small">${esc(cur.artist)}</div>` : ''}</div>`
+      : `<div class="empty">${n ? '尚未選擇選手，按「下一位」開始比賽' : `${esc(rName())}${aGroup ? esc(aGroup) : ''}還沒有名單，請先到「選手與曲目」新增`}</div>`}
+    ${cur && aGroup && vi < 0 ? `<p class="warn small" style="margin:10px 0 0">台上是${esc(cur.group || '未分組')}的選手；按「下一位」會從${esc(aGroup)}第一位開始。</p>` : ''}
+    <div class="row" style="margin-top:14px"><button data-act="prev" ${vi <= 0 ? 'disabled' : ''}>◀ 上一位</button><button data-act="next" ${!n || vi >= n - 1 ? 'disabled' : ''}>${vi < 0 ? `開始：${aGroup ? esc(aGroup) : ''}第一位 ▶` : '下一位 ▶'}</button></div>
     <div class="row">
       <button class="ok" data-act="setst" data-st="open" ${!cur || st === 'open' ? 'disabled' : ''}>${st === 'locked' ? '解鎖並重新開放' : '▶ 開放評分'}</button>
       <button class="pri" data-act="setst" data-st="locked" ${!cur || st === 'locked' ? 'disabled' : ''}>🔒 鎖定分數</button>
@@ -898,42 +922,62 @@ AV.control = () => {
     }).join('')}</div>
     ${cur ? (() => { const r = result(cur.id); return `<div class="avg">平均得分 <b>${fmt(r.avg)}</b> <span class="muted small">（${r.n}/${S.judges.length} 位評審已送出）</span></div>`; })() : ''}`);
 
-  put('cQueue', [S.contestants, S.status, S.scores, S.current, S.judges, S.criteria, S.settings], () => `
-    <h3>出場順序</h3><div class="tablewrap"><table><thead><tr><th>#</th><th>姓名</th><th>組別</th><th>曲目</th><th>狀態</th><th>評審送出</th><th class="num">平均</th><th></th></tr></thead><tbody>
-    ${S.contestants.map((c, k) => { const r = result(c.id);
-      return `<tr class="${c.id === S.current ? 'cur' : ''}"><td>${k + 1}</td><td>${esc(c.name)}</td><td>${esc(c.group)}</td><td>${esc(c.song)}</td>
+  put('cQueue', [S.contestants, S.status, S.scores, S.current, S.judges, S.criteria, S.settings, aGroup], () => `
+    <h3>出場順序・${esc(gLabel())}</h3><div class="tablewrap"><table><thead><tr><th>#</th><th>姓名</th>${aGroup ? '' : '<th>組別</th>'}<th>曲目</th><th>狀態</th><th>評審送出</th><th class="num">平均</th><th></th></tr></thead><tbody>
+    ${vis.map(c => { const r = result(c.id);
+      return `<tr class="${c.id === S.current ? 'cur' : ''}"><td>${idx(c.id) + 1}</td><td>${esc(c.name)}</td>${aGroup ? '' : `<td>${esc(c.group)}</td>`}<td>${esc(c.song)}</td>
         <td><span class="chip ${stOf(c.id)}">${ST_LABEL[stOf(c.id)]}</span></td><td>${r.n}/${S.judges.length}</td><td class="num">${fmt(r.avg)}</td>
         <td>${c.id === S.current ? '<span class="muted small">目前</span>' : `<button class="sm" data-act="goto" data-id="${c.id}">切換至此</button>`}</td></tr>`;
-    }).join('') || '<tr><td colspan="8" class="muted">尚無選手</td></tr>'}</tbody></table></div>`);
+    }).join('') || `<tr><td colspan="8" class="muted">${esc(gLabel())}尚無選手</td></tr>`}</tbody></table></div>`);
 };
 
 let ctRid = sessionStorage.getItem('sc_ctrid') || '', resRid = '', gsScope = 'round';
 const roundSeg = (act, sel) => `<div class="seg">${S.roundIds.map(id => `<button class="${id === sel ? 'act' : ''}" data-act="${act}" data-r="${id}">${esc(rName(id))}${id === S.round ? ' ●' : ''}</button>`).join('')}</div>`;
-const allGroups = () => [...new Set([...GROUP_PRESETS, ...S.roundIds.flatMap(id => R(id).contestants.map(c => c.group)).filter(Boolean)])];
+const allGroups = () => [...new Set([...S.groups, ...S.roundIds.flatMap(id => R(id).contestants.map(c => c.group)).filter(Boolean)])];
+let aGroup = sessionStorage.getItem('sc_agroup') || '';
+const isTeam = g => S.teamGroups.includes(g || '');
+const memberList = c => String(c.members || '').split(/[、,，;；\/\n]+/).map(x => x.trim()).filter(Boolean);
+const membersText = c => memberList(c).join('、');
+// 同一賽次中，出現在兩支以上隊伍的成員
+function dupMembers(rid) {
+  const seen = {}, dup = {};
+  R(rid).contestants.filter(c => isTeam(c.group)).forEach(c => memberList(c).forEach(m => { (seen[m] = seen[m] || []).push(c.name || '未命名隊伍'); }));
+  for (const m in seen) if (seen[m].length > 1) dup[m] = seen[m];
+  return dup;
+}
+const inG = c => !aGroup || (c.group || '') === aGroup;
+const gLabel = () => aGroup || '全部組別';
 AV.contestants = () => {
   if (!S.rounds[ctRid]) ctRid = S.round;
-  const rd = R(ctRid), list = rd.contestants, first = S.roundIds.indexOf(ctRid) === 0;
-  put('ctList', [ctRid, list, S.status, S.round, rd.current, S.roundIds.map(rName), allGroups()], () => `
+  const rd = R(ctRid), all = rd.contestants, list = all.filter(inG), first = S.roundIds.indexOf(ctRid) === 0;
+  const showMem = aGroup ? isTeam(aGroup) : list.some(c => isTeam(c.group)), dup = dupMembers(ctRid);
+  put('ctList', [ctRid, all, S.status, S.round, rd.current, S.roundIds.map(rName), allGroups(), aGroup, S.teamGroups], () => `
     <div class="row between"><div class="row"><h3 style="margin:0">選手與曲目</h3>${roundSeg('ctRound', ctRid)}</div>
-      <div class="row"><button data-act="ctAdd">＋ 新增${esc(rd.name)}選手</button>${list.length || !first ? '' : '<button class="ghost" data-act="ctSample">載入範例資料</button>'}</div></div>
-    <p class="muted small" style="margin:10px 0">${esc(rd.name)}共 ${list.length} 位，依出場順序排列（● 為進行中的賽次）。${first ? '' : '此名單通常由上一賽次「產生晉級名單」自動建立，也可以手動調整。'}</p>
+      <div class="row"><button data-act="ctAdd">＋ 新增${esc(rd.name)}${aGroup ? esc(aGroup) : ''}選手</button>${all.length || !first ? '' : '<button class="ghost" data-act="ctSample">載入範例資料</button>'}</div></div>
+    <p class="muted small" style="margin:10px 0">${esc(rd.name)}・${esc(gLabel())}共 ${list.length} 位，依出場順序排列（● 為進行中的賽次；# 為整個賽次的出場序）。${first ? '' : '此名單通常由上一賽次「產生晉級名單」自動建立，也可以手動調整。'}</p>
+    ${Object.keys(dup).length ? `<div class="warnbox">⚠ 以下成員同時出現在多支隊伍：${Object.entries(dup).map(([m, t]) => `<b>${esc(m)}</b>（${t.map(esc).join('、')}）`).join('；')}。如果是同名的不同人，可以忽略這個提醒。</div>` : ''}
     <datalist id="groupList">${allGroups().map(g => `<option value="${esc(g)}">`).join('')}</datalist>
-    <div class="tablewrap"><table class="edit"><thead><tr><th>#</th><th>姓名／團名</th><th>組別</th><th>演唱曲目</th><th>原唱／備註</th><th></th></tr></thead><tbody>
-    ${list.map((c, i) => `<tr class="${c.id === rd.current && ctRid === S.round ? 'cur' : ''}"><td>${i + 1}</td>
-      ${['name', 'group', 'song', 'artist'].map(f => `<td><input id="ct_${c.id}_${f}" data-ct="${c.id}" data-f="${f}" value="${esc(c[f])}" ${f === 'group' ? 'list="groupList"' : ''} ${f === 'song' && !c.song && c.from ? `placeholder="${esc('上一賽次：' + ((prevRid(ctRid) && (R(prevRid(ctRid)).contestants.find(x => x.id === c.from) || {}).song) || ''))}"` : ''}></td>`).join('')}
+    <div class="tablewrap"><table class="edit"><thead><tr><th>#</th><th>${isTeam(aGroup) ? '隊名' : aGroup ? '姓名' : '姓名／隊名'}</th>${aGroup ? '' : '<th>組別</th>'}${showMem ? `<th>成員（用「、」分隔）</th>` : ''}<th>演唱曲目</th><th>原唱／備註</th><th></th></tr></thead><tbody>
+    ${list.map((c, i) => `<tr class="${c.id === rd.current && ctRid === S.round ? 'cur' : ''}"><td>${all.indexOf(c) + 1}</td>
+      ${(aGroup ? ['name', 'members', 'song', 'artist'] : ['name', 'group', 'members', 'song', 'artist']).filter(f => f !== 'members' || showMem).map(f => f === 'members' && !isTeam(c.group) ? '<td class="muted small">—</td>' : f === 'members' ? `<td class="mem-cell"><input id="ct_${c.id}_members" data-ct="${c.id}" data-f="members" value="${esc(membersText(c))}" placeholder="例如：王小明、林怡君、陳家豪"><span class="small ${memberList(c).length ? 'muted' : 'warn'}">${memberList(c).length ? `${memberList(c).length} 人` : '尚未填寫成員'}${memberList(c).some(m => dup[m]) ? '<span class="warn">・有成員重複</span>' : ''}</span></td>` : `<td><input id="ct_${c.id}_${f}" data-ct="${c.id}" data-f="${f}" value="${esc(c[f])}" ${f === 'group' ? 'list="groupList"' : ''} ${f === 'song' && !c.song && c.from ? `placeholder="${esc('上一賽次：' + ((prevRid(ctRid) && (R(prevRid(ctRid)).contestants.find(x => x.id === c.from) || {}).song) || ''))}"` : ''}></td>`).join('')}
       <td class="nowrap"><button class="ghost sm" data-act="ctMove" data-id="${c.id}" data-d="-1" ${i === 0 ? 'disabled' : ''}>↑</button><button class="ghost sm" data-act="ctMove" data-id="${c.id}" data-d="1" ${i === list.length - 1 ? 'disabled' : ''}>↓</button> <button class="bad sm" data-act="ctDel" data-id="${c.id}">刪除</button></td></tr>`).join('')
-      || `<tr><td colspan="6" class="muted">${first ? '尚無選手，請新增或使用下方批次匯入' : '尚無名單。上一賽次完成後，到「賽程與晉級」產生晉級名單即可'}</td></tr>`}
+      || `<tr><td colspan="6" class="muted">${first ? `${esc(gLabel())}尚無選手，請新增或使用下方批次匯入` : '尚無名單。上一賽次完成後，到「賽程與晉級」產生晉級名單即可'}</td></tr>`}
     </tbody></table></div><p class="muted small">修改欄位後點到別處即自動儲存，所有電腦會同步更新。組別可直接選「個人組」「團體組」，也能自行輸入。</p>`, true);
-  put('ctImport', [ctRid, rName(ctRid)], () => `
-    <h3>批次匯入到「${esc(rName(ctRid))}」</h3><p class="muted small">每行一位：<b>姓名, 演唱曲目, 原唱/備註, 組別</b>（逗號或 Tab 分隔，可直接從 Excel 複製貼上）</p>
-    <textarea id="impText" rows="6" placeholder="王小明, 小幸運, 田馥甄, 個人組&#10;好聲音合唱團, 稻香, 周杰倫, 團體組"></textarea>
+  put('ctImport', [ctRid, rName(ctRid), aGroup, S.teamGroups], () => `
+    <h3>批次匯入到「${esc(rName(ctRid))}${aGroup ? '・' + esc(aGroup) : ''}」</h3><p class="muted small">每行一筆：<b>${isTeam(aGroup) ? '隊名' : '姓名'}, 演唱曲目, 原唱/備註${aGroup ? '' : ', 組別'}${!aGroup || isTeam(aGroup) ? ', 成員（用「、」分隔，團體才需要）' : ''}</b>（逗號或 Tab 分隔，可直接從 Excel 複製貼上）${aGroup ? `。匯入的選手會自動歸到「${esc(aGroup)}」。` : ''}</p>
+    <textarea id="impText" rows="6" placeholder="${aGroup ? (isTeam(aGroup) ? '好聲音合唱團, 稻香, 周杰倫, 王小明、林怡君、陳家豪' : '王小明, 小幸運, 田馥甄') : '王小明, 小幸運, 田馥甄, 個人組&#10;好聲音合唱團, 稻香, 周杰倫, 團體組, 林怡君、陳家豪、張雅婷'}"></textarea>
     <div class="row" style="margin-top:10px"><button class="pri" data-act="ctImport">加入名單</button></div>`, true);
+  put('ctGroups', [S.groups, S.teamGroups, S.roundIds.map(id => R(id).contestants.map(c => c.group))], () => `
+    <h3>組別管理</h3><p class="muted small">組別名稱改了之後，所有賽次的選手與晉級名額都會一起更新。</p>
+    <div class="grp-grid">${S.groups.map(g => { const n = S.roundIds.reduce((a, id) => a + R(id).contestants.filter(c => (c.group || '') === g).length, 0);
+      return `<div class="grp"><input id="gr_${esc(g)}" data-gr="${esc(g)}" value="${esc(g)}"><label class="ck" style="margin:8px 0 0"><input type="checkbox" data-gt="${esc(g)}" ${isTeam(g) ? 'checked' : ''}> 團體組別（每隊要填成員）</label><div class="row between" style="margin-top:4px"><span class="small muted">全部賽次共 ${n} 筆</span><button class="bad sm" data-act="grpDel" data-g="${esc(g)}">刪除</button></div></div>`; }).join('')}
+      <div class="grp" style="justify-content:center;align-items:center"><button data-act="grpAdd">＋ 新增組別</button></div></div>`, true);
 };
 
 /* ---------- 賽程與晉級 ---------- */
 function qualifyPreview(rid) {
   const r = R(rid), q = new Set(qualifiers(rid).map(x => x.c.id));
-  const groups = r.advMode === 'group' ? [...new Set(r.contestants.map(c => c.group || ''))] : [null];
+  const groups = r.advMode === 'group' ? groupsOf(r).filter(g => !aGroup || g === aGroup) : [null];
   return groups.map(g => {
     const { rows, scored } = g === null ? rankRound(rid, '') : rankRound(rid, g, true);
     const n = quotaOf(r, g), qn = scored.filter(x => q.has(x.c.id)).length, tie = qn > n;
@@ -948,7 +992,7 @@ AV.rounds = () => {
     <div class="flow">${ids.map((id, i) => { const l = R(id).contestants, d = l.filter(c => stOf(c.id) === 'locked').length;
       return `${i ? '<span class="flow-ar">→</span>' : ''}<div class="flow-it ${id === S.round ? 'on' : ''}"><div class="flow-n">${esc(rName(id))}${id === S.round ? '<span class="chip open">進行中</span>' : ''}</div><div class="small muted">${l.length} 位・已完成 ${d}/${l.length}</div></div>`; }).join('')}</div>
     <p class="muted small" style="margin:12px 0 0">每個賽次有自己的名單、曲目與分數。上一賽次完成後，系統會依晉級規則自動產生下一賽次名單。</p>`);
-  put('rdCards', [ids, ids.map(id => R(id)), S.scores, S.status, S.round, S.judges, S.criteria, S.settings], () => ids.map((id, i) => {
+  put('rdCards', [ids, ids.map(id => R(id)), S.scores, S.status, S.round, S.judges, S.criteria, S.settings, S.groups, aGroup], () => ids.map((id, i) => {
     const r = R(id), nx = nextRid(id), nxName = nx ? rName(nx) : (ROUND_NAMES[i + 1] || `第 ${i + 2} 輪`), l = r.contestants, d = l.filter(c => stOf(c.id) === 'locked').length;
     const nxList = nx ? R(nx).contestants.length : 0, adv = isAdv(id), grp = r.advMode === 'group';
     return `<section class="card rd ${id === S.round ? 'on' : ''}" style="margin-top:16px">
@@ -961,7 +1005,7 @@ AV.rounds = () => {
         ${i > 0 ? `<label class="lbl">加計${esc(rName(prevRid(id)))}成績<input type="number" min="0" max="100" id="rdc_${id}" data-rd="${id}" data-f="carry" value="${+r.carry || 0}"><span class="small">%（0 = 只看本賽次）</span></label>` : '<div></div>'}
         ${grp ? '' : `<label class="lbl">總排名取前幾名<input type="number" min="0" id="rda_${id}" data-rd="${id}" data-f="advance" value="${+r.advance || 0}"><span class="small">填 0 代表這是最終賽次</span></label>`}
       </div>
-      ${grp ? `<div class="quota"><div class="small muted" style="margin-bottom:8px">各組晉級名額（全部填 0 代表這是最終賽次）</div><div class="quota-list">${groupsOf(r).map(g => { const tot = l.filter(c => (c.group || '') === g).length;
+      ${grp ? `<div class="quota"><div class="small muted" style="margin-bottom:8px">${aGroup ? `${esc(aGroup)}晉級名額（0 代表這組在本賽次就結束）` : '各組晉級名額（全部填 0 代表這是最終賽次）'}</div><div class="quota-list">${groupsOf(r).filter(g => !aGroup || g === aGroup).map(g => { const tot = l.filter(c => (c.group || '') === g).length;
         return `<label class="qt"><b>${esc(g || '未分組')}</b><span class="muted small">${tot ? `共 ${tot} ${g === '團體組' ? '組' : '位'}` : '尚無名單'}</span><span class="qt-in">取前<input type="number" min="0" id="rdq_${id}_${esc(g)}" data-rd="${id}" data-f="advanceBy" data-g="${esc(g)}" value="${quotaOf(r, g)}">名</span></label>`; }).join('')}</div></div>` : ''}
       <div class="row">${ck2(id, 'auto', r.auto, '本賽次全部鎖定後，自動產生晉級名單')}${ck2(id, 'keepSong', r.keepSong, '晉級者沿用本賽次曲目')}</div>
       ${adv ? `<div class="qp-wrap">${qualifyPreview(id)}</div>
@@ -993,7 +1037,7 @@ async function doAdvance(rid, auto) {
     if (g) return g;
     return r.advOrder === 'reverse' ? a.f - b.f : r.advOrder === 'rank' ? b.f - a.f : a.i - b.i;
   });
-  const entries = list.map(x => { const id = uid(); return { id, pid: x.c.pid, name: x.c.name, group: x.c.group || '', song: r.keepSong ? x.c.song || '' : '', artist: r.keepSong ? x.c.artist || '' : '', from: x.c.id }; });
+  const entries = list.map(x => { const id = uid(); return { id, pid: x.c.pid, name: x.c.name, group: x.c.group || '', members: x.c.members || '', song: r.keepSong ? x.c.song || '' : '', artist: r.keepSong ? x.c.artist || '' : '', from: x.c.id }; });
   ops.push({ op: 'set', path: ['rounds', nid, 'contestants'], value: entries }, { op: 'set', path: ['rounds', nid, 'current'], value: null });
   if (await send(ops)) toast(`${auto ? '本賽次已全部完成，已自動' : '已'}產生${nextName}名單：${entries.length} 位晉級`);
 }
@@ -1044,13 +1088,11 @@ AV.settings = () => {
 AV.results = () => {
   if (!S.rounds[resRid]) resRid = S.round;
   const rd = R(resRid), groups = [...new Set(rd.contestants.map(c => c.group).filter(Boolean))], carry = +rd.carry > 0 && prevRid(resRid);
-  if (resGroup && !groups.includes(resGroup)) resGroup = '';
-  put('rsTable', [resRid, rd, S.scores, S.judges, S.criteria, S.settings, S.status, resSort, resGroup, S.round, S.roundIds.map(rName)], () => {
-    const { rows, scored } = rankRound(resRid, resGroup), q = new Set(qualifiers(resRid).map(x => x.c.id)), adv = isAdv(resRid);
+  put('rsTable', [resRid, rd, S.scores, S.judges, S.criteria, S.settings, S.status, resSort, aGroup, S.round, S.roundIds.map(rName)], () => {
+    const { rows, scored } = rankRound(resRid, aGroup, !!aGroup), q = new Set(qualifiers(resRid).map(x => x.c.id)), adv = isAdv(resRid);
     const list = resSort === 'rank' ? [...scored, ...rows.filter(x => x.f == null)] : rows;
     const pr = prevRid(resRid);
-    return `<div class="row between"><div class="row"><h3 style="margin:0">成績排名</h3>${roundSeg('resRound', resRid)}</div><div class="row">
-        ${groups.length ? `<select id="resGroup" style="width:auto"><option value="">全部組別</option>${groups.map(g => `<option ${g === resGroup ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select>` : ''}
+    return `<div class="row between"><div class="row"><h3 style="margin:0">成績排名・${esc(gLabel())}</h3>${roundSeg('resRound', resRid)}</div><div class="row">
         <div class="seg"><button class="${resSort === 'rank' ? 'act' : ''}" data-act="resSort" data-v="rank">依名次</button><button class="${resSort === 'order' ? 'act' : ''}" data-act="resSort" data-v="order">依出場序</button></div>
         <button data-act="csv">匯出 Excel (CSV)</button></div></div>
       ${carry ? `<p class="muted small">總成績 = ${esc(rd.name)}平均 × ${100 - rd.carry}% ＋ ${esc(rName(pr))}成績 × ${rd.carry}%</p>` : ''}
@@ -1073,7 +1115,7 @@ AV.data = () => put('dtBox', [mode, S.roundIds.map(id => [rName(id), R(id).conte
   <h3>依組別重置</h3>
   <p class="muted small">例如只重來「團體組」，不影響個人組。清除名單時，該組選手的分數也會一起刪除。</p>
   <div class="row" style="margin-bottom:12px"><span class="small muted">範圍：</span><select id="gsScope" style="width:auto"><option value="round">只限進行中的賽次（${esc(rName())}）</option><option value="all" ${gsScope === 'all' ? 'selected' : ''}>全部賽次</option></select></div>
-  <div class="grp-grid">${[...new Set([...GROUP_PRESETS, ...S.roundIds.flatMap(id => R(id).contestants.map(c => c.group || ''))])].map(g => {
+  <div class="grp-grid">${[...new Set([...allGroups(), ...S.roundIds.flatMap(id => R(id).contestants.map(c => c.group || ''))])].map(g => {
     const n = S.roundIds.reduce((a, id) => a + R(id).contestants.filter(c => (c.group || '') === g).length, 0);
     return `<div class="grp"><b>${esc(g || '未分組')}</b><span class="small muted">全部賽次共 ${n} 筆</span><div class="row" style="margin-top:8px"><button class="bad sm" data-act="grpReset" data-g="${esc(g)}" data-w="scores">清除分數</button><button class="bad sm" data-act="grpReset" data-g="${esc(g)}" data-w="list">清除名單</button></div></div>`;
   }).join('')}</div>
@@ -1237,7 +1279,7 @@ function sceneHTML(d, prevHide) {
       if (!cur) return standbyHTML(d, '比賽即將開始');
       return `<div class="sc-current"><div class="cur-meta"><span class="cur-tag">${esc(rName())}</span>${cur.group ? `<span class="cur-tag ghost">${esc(cur.group)}</span>` : ''}<span class="cur-of">第 ${i + 1} 位 / 共 ${S.contestants.length} 位</span></div>
         <div class="cur-grid"><div class="cur-no">${pad2(i + 1)}</div><div class="cur-info"><div class="cur-name">${esc(cur.name)}</div>
-        ${cur.song ? `<div class="cur-song"><span class="note">♪</span><span>${esc(cur.song)}</span></div>` : ''}${cur.artist ? `<div class="cur-artist">${esc(cur.artist)}</div>` : ''}</div></div>
+        ${cur.song ? `<div class="cur-song"><span class="note">♪</span><span>${esc(cur.song)}</span></div>` : ''}${cur.artist ? `<div class="cur-artist">${esc(cur.artist)}</div>` : ''}${memberList(cur).length ? `<div class="cur-mem">${memberList(cur).map(m => `<span>${esc(m)}</span>`).join('')}</div>` : ''}</div></div>
         ${d.current.progress ? `<div class="jprog">${S.judges.map(j => `<div class="jp ${(S.scores[cur.id] || {})[j.id] ? 'ok' : ''}"><i></i><span>${esc(j.name)}</span></div>`).join('')}</div>` : ''}</div>`;
     }
     case 'promo': {
@@ -1396,8 +1438,17 @@ const ACT = {
   switch() { if (!confirm('要切換這台電腦的身分嗎？')) return; me.role = null; me.seat = null; saveMe(); reconnect(); render(); },
   fs() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); },
   tab(b) { adminTab = b.dataset.tab; sessionStorage.setItem('sc_tab', adminTab); render(); },
-  prev() { const i = idx(S.current); if (i > 0) setCur(S.contestants[i - 1].id); },
-  next() { const n = S.contestants[idx(S.current) + 1]; if (n) setCur(n.id); },
+  prev() { const vis = S.contestants.filter(inG), i = vis.findIndex(c => c.id === S.current); if (i > 0) setCur(vis[i - 1].id); },
+  next() { const vis = S.contestants.filter(inG), i = vis.findIndex(c => c.id === S.current), n = i < 0 ? vis[0] : vis[i + 1]; if (n) setCur(n.id); },
+  aGroup(b) { aGroup = b.dataset.g; sessionStorage.setItem('sc_agroup', aGroup); render(); },
+  grpAdd() { const g = (prompt('新增組別名稱（例如：親子組、主管組）') || '').trim(); if (!g) return; if (allGroups().includes(g)) { toast('已經有這個組別'); return; } const team = confirm(`「${g}」是團體組別嗎？\n按「確定」＝團體（每隊要填成員）；按「取消」＝個人`); send([{ op: 'set', path: ['groups'], value: [...S.groups, g] }, ...(team ? [{ op: 'set', path: ['teamGroups'], value: [...S.teamGroups, g] }] : [])]).then(ok => { if (ok) { aGroup = g; sessionStorage.setItem('sc_agroup', g); toast(`已新增「${g}」`); } }); },
+  grpDel(b) {
+    const g = b.dataset.g, used = S.roundIds.some(id => R(id).contestants.some(c => (c.group || '') === g));
+    if (used) { alert(`「${g}」還有選手，請先到「資料備份」的「依組別重置」清除名單，再刪除組別。`); return; }
+    if (!confirm(`刪除組別「${g}」？`)) return;
+    if (aGroup === g) { aGroup = ''; sessionStorage.setItem('sc_agroup', ''); }
+    send([{ op: 'set', path: ['groups'], value: S.groups.filter(x => x !== g) }]);
+  },
   goto(b) { setCur(b.dataset.id); },
   setst(b) {
     const cid = S.current; if (!cid) return; const v = b.dataset.st;
@@ -1445,7 +1496,7 @@ const ACT = {
     send(ops);
   },
   ctRound(b) { ctRid = b.dataset.r; sessionStorage.setItem('sc_ctrid', ctRid); render(); },
-  ctAdd() { const rid = ctRid || S.round, id = uid(); pendingFocus = `ct_${id}_name`; send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: [...R(rid).contestants, { id, pid: id, name: '', group: '', song: '', artist: '' }] }]); },
+  ctAdd() { const rid = ctRid || S.round, id = uid(); pendingFocus = `ct_${id}_name`; send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: [...R(rid).contestants, { id, pid: id, name: '', group: aGroup, song: '', artist: '' }] }]); },
   ctDel(b) {
     const rid = ctRid || S.round, c = R(rid).contestants.find(x => x.id === b.dataset.id); if (!c) return;
     const has = S.scores[c.id] && Object.keys(S.scores[c.id]).length;
@@ -1454,16 +1505,21 @@ const ACT = {
     if (R(rid).current === c.id) ops.push({ op: 'set', path: ['rounds', rid, 'current'], value: null });
     send(ops);
   },
-  ctMove(b) { const rid = ctRid || S.round, list = clone(R(rid).contestants), i = list.findIndex(x => x.id === b.dataset.id), j = i + +b.dataset.d; if (i < 0 || j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: list }]); },
+  ctMove(b) {
+    const rid = ctRid || S.round, list = clone(R(rid).contestants), vis = list.filter(inG), vi = vis.findIndex(x => x.id === b.dataset.id), vj = vi + +b.dataset.d;
+    if (vi < 0 || vj < 0 || vj >= vis.length) return;
+    const i = list.indexOf(vis[vi]), j = list.indexOf(vis[vj]); [list[i], list[j]] = [list[j], list[i]];
+    send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: list }]);
+  },
   ctSample() {
-    const s = [['王小明', '小幸運', '田馥甄', '個人組'], ['林怡君', '魚仔', '盧廣仲', '個人組'], ['陳家豪', '告白氣球', '周杰倫', '個人組'], ['張雅婷', '突然好想你', '五月天', '個人組'], ['好聲音合唱團', '稻香', '周杰倫', '團體組'], ['南風三重唱', '小手拉大手', '梁靜茹', '團體組'], ['和聲小隊', '倔強', '五月天', '團體組']];
-    send([{ op: 'set', path: ['rounds', ctRid || S.round, 'contestants'], value: s.map(([name, song, artist, group]) => { const id = uid(); return { id, pid: id, name, song, artist, group }; }) }]);
+    const s = [['王小明', '小幸運', '田馥甄', '個人組'], ['林怡君', '魚仔', '盧廣仲', '個人組'], ['陳家豪', '告白氣球', '周杰倫', '個人組'], ['張雅婷', '突然好想你', '五月天', '個人組'], ['好聲音合唱團', '稻香', '周杰倫', '團體組', '李佳穎、黃志明、吳欣怡、周柏翰'], ['南風三重唱', '小手拉大手', '梁靜茹', '團體組', '許雅雯、蔡宗翰、鄭依婷'], ['和聲小隊', '倔強', '五月天', '團體組', '劉冠廷、楊舒涵']];
+    send([{ op: 'set', path: ['rounds', ctRid || S.round, 'contestants'], value: s.filter(x => !aGroup || x[3] === aGroup).map(([name, song, artist, group, members]) => { const id = uid(); return { id, pid: id, name, song, artist, group, members: members || '' }; }) }]);
   },
   ctImport() {
     const rid = ctRid || S.round, t = $('#impText'); const lines = t.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     if (!lines.length) { toast('請先貼上名單'); return; }
-    const add = lines.map(l => { const p = l.split(/\t|,|，/).map(x => x.trim()), id = uid(); return { id, pid: id, name: p[0] || '', song: p[1] || '', artist: p[2] || '', group: p[3] || '' }; });
-    send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: [...R(rid).contestants, ...add] }]).then(ok => { if (ok) { t.value = ''; toast(`已加入 ${add.length} 位選手到${rName(rid)}`); } });
+    const add = lines.map(l => { const p = l.split(/\t|,|，/).map(x => x.trim()), id = uid();  const grp = aGroup || p[3] || '', mem = aGroup ? p.slice(3).join('、') : p.slice(4).join('、'); return { id, pid: id, name: p[0] || '', song: p[1] || '', artist: p[2] || '', group: grp, members: isTeam(grp) ? mem : '' }; });
+    send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: [...R(rid).contestants, ...add] }]).then(ok => { if (ok) { t.value = ''; toast(`已加入 ${add.length} 位選手到${rName(rid)}${aGroup ? '・' + aGroup : ''}`); } });
   },
   scale(b) {
     const v = +b.dataset.v; if (v === scale()) return;
@@ -1475,7 +1531,7 @@ const ACT = {
   resSort(b) { resSort = b.dataset.v; render(); },
   resRound(b) { resRid = b.dataset.r; render(); },
   csv() {
-    const rid = S.rounds[resRid] ? resRid : S.round, rd = R(rid), { rows, scored } = rankRound(rid, ''), q = new Set(qualifiers(rid).map(x => x.c.id));
+    const rid = S.rounds[resRid] ? resRid : S.round, rd = R(rid), { rows, scored } = rankRound(rid, aGroup, !!aGroup), q = new Set(qualifiers(rid).map(x => x.c.id));
     const rk = new Map(scored.map(x => [x.c.id, x.rank]));
     const head = ['賽次', '名次', '出場序', '姓名', '組別', '曲目', '原唱/備註', ...S.judges.flatMap(j => [...S.criteria.map(c => `${j.name}-${c.name}`), `${j.name}-總分`, `${j.name}-評語`]), '本賽次平均', '總成績', '晉級', '狀態'];
     const data = rows.map(x => {
@@ -1485,7 +1541,7 @@ const ACT = {
         x.r.avg == null ? '' : fmt(x.r.avg), x.f == null ? '' : fmt(x.f), q.has(x.c.id) ? '晉級' : '', ST_LABEL[stOf(x.c.id)]];
     });
     const csv = '\ufeff' + [head, ...data].map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
-    download(csv, `${S.settings.title}-${rd.name}-成績-${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv;charset=utf-8');
+    download(csv, `${S.settings.title}-${rd.name}${aGroup ? '-' + aGroup : ''}-成績-${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv;charset=utf-8');
   },
   grpReset(b) {
     const g = b.dataset.g, what = b.dataset.w, all = gsScope === 'all';
@@ -1521,12 +1577,26 @@ document.addEventListener('change', e => {
   if (t.id === 'autoTake') { autoTake = t.checked; sessionStorage.setItem('sc_autotake', autoTake ? '1' : ''); if (autoTake) ACT.take(); render(); return; }
   if (t.id === 'devLabel') { reconnect(); render(); return; }
   if (t.dataset.crit) { if (t.type === 'number' && t.value !== '') { t.value = Math.max(0, Math.min(scale(), +t.value)); setCrit(t); } return; }
+  if (t.dataset.gt !== undefined) { const g = t.dataset.gt; send([{ op: 'set', path: ['teamGroups'], value: t.checked ? [...new Set([...S.teamGroups, g])] : S.teamGroups.filter(x => x !== g) }]); return; }
+  if (t.dataset.gr) {
+    const old = t.dataset.gr, nw = t.value.trim();
+    if (!nw || nw === old) { t.value = old; return; }
+    if (allGroups().includes(nw)) { toast('已經有這個組別'); t.value = old; return; }
+    const ops = [{ op: 'set', path: ['groups'], value: S.groups.map(g => g === old ? nw : g) }, { op: 'set', path: ['teamGroups'], value: S.teamGroups.map(g => g === old ? nw : g) }];
+    S.roundIds.forEach(id => {
+      const r = R(id);
+      if (r.contestants.some(c => c.group === old)) ops.push({ op: 'set', path: ['rounds', id, 'contestants'], value: r.contestants.map(c => c.group === old ? Object.assign({}, c, { group: nw }) : c) });
+      if (r.advanceBy && old in r.advanceBy) { const ab = Object.assign({}, r.advanceBy); ab[nw] = ab[old]; delete ab[old]; ops.push({ op: 'set', path: ['rounds', id, 'advanceBy'], value: ab }); }
+    });
+    if (aGroup === old) { aGroup = nw; sessionStorage.setItem('sc_agroup', nw); }
+    send(ops); return;
+  }
   if (t.dataset.rd && t.dataset.f === 'advanceBy') { send([{ op: 'set', path: ['rounds', t.dataset.rd, 'advanceBy', t.dataset.g], value: Math.max(0, Math.round(+t.value || 0)) }]); return; }
   if (t.dataset.rd) {
     const f = t.dataset.f, v = t.type === 'checkbox' ? t.checked : (f === 'advance' || f === 'carry') ? Math.max(0, Math.min(f === 'carry' ? 100 : 999, Math.round(+t.value || 0))) : (t.value.trim() || R(t.dataset.rd).name);
     send([{ op: 'set', path: ['rounds', t.dataset.rd, f], value: v }]); return;
   }
-  if (t.dataset.ct) { const rid = ctRid || S.round, list = clone(R(rid).contestants), c = list.find(x => x.id === t.dataset.ct); if (!c) return; c[t.dataset.f] = t.value.trim(); send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: list }]); return; }
+  if (t.dataset.ct) { const rid = ctRid || S.round, list = clone(R(rid).contestants), c = list.find(x => x.id === t.dataset.ct); if (!c) return; c[t.dataset.f] = t.dataset.f === 'members' ? memberList({ members: t.value }).join('、') : t.value.trim(); send([{ op: 'set', path: ['rounds', rid, 'contestants'], value: list }]); return; }
   if (t.dataset.jd) { const list = clone(S.judges), j = list.find(x => x.id === t.dataset.jd); j.name = t.value.trim() || j.name; send([{ op: 'set', path: ['judges'], value: list }]); return; }
   if (t.dataset.cr) { const list = clone(S.criteria), c = list.find(x => x.id === t.dataset.cr); c[t.dataset.f] = t.dataset.f === 'weight' ? Math.max(0, +t.value || 0) : (t.value.trim() || c.name); send([{ op: 'set', path: ['criteria'], value: list }]); return; }
   if (t.dataset.set) { send([{ op: 'set', path: ['settings', t.dataset.set], value: t.dataset.set === 'decimals' ? +t.value : (t.value.trim() || '歌唱比賽') }]); return; }
@@ -1537,7 +1607,6 @@ document.addEventListener('change', e => {
     send([{ op: 'set', path: ['judges'], value: list }]); return;
   }
   if (t.id === 'gsScope') { gsScope = t.value; return; }
-  if (t.id === 'resGroup') { resGroup = t.value; render(); return; }
   if (t.id === 'impFile' && t.files[0]) {
     const r = new FileReader();
     r.onload = () => { try { const obj = JSON.parse(r.result); if (!confirm('匯入會覆蓋目前所有資料，確定嗎？')) return; send([{ op: 'replace', path: [], value: obj }]).then(ok => ok && toast('匯入完成')); } catch (err) { toast('檔案格式錯誤'); } t.value = ''; };
