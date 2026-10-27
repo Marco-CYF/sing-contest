@@ -111,6 +111,15 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && u.pathname === '/kv.jpg') {
+    fs.readFile(path.join(DIR, 'kv.jpg'), (err, buf) => {
+      if (err) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=86400' });
+      res.end(buf);
+    });
+    return;
+  }
+
   if (req.method === 'GET' && u.pathname === '/events') {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream; charset=utf-8',
