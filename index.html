@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>歌唱比賽評分系統</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Saira:ital,wght@0,600;1,800;1,900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0e1120;--bg2:#141830;--panel:#1a1f38;--panel2:#232948;--line:#30375c;
@@ -245,6 +245,12 @@ hr{border:0;border-top:1px solid var(--line);margin:18px 0}
 
 
 /* ===== 賽程與晉級 ===== */
+.quota{margin-top:14px;padding:14px;border-radius:12px;border:1px solid var(--line);background:rgba(7,10,46,.45)}
+.quota-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.qt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+.qt b{font-size:15px}.qt-in{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:14px}
+.qt-in input{width:64px;text-align:center;font-weight:800;font-size:17px;padding:5px}
+
 .banner-ok{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:14px;border-radius:10px;background:rgba(53,208,143,.1);border:1px solid #1f6a4b;font-size:14px}
 .flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
 .flow-it{padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--bg2);min-width:150px}
@@ -279,6 +285,94 @@ hr{border:0;border-top:1px solid var(--line);margin:18px 0}
 .qg-it span{font-size:1.4cqw;color:var(--sa);font-weight:900;font-variant-numeric:tabular-nums}
 .qg-it b{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qg-it small{font-size:1.3cqw;color:var(--sm);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ================= SuperStar 主視覺：介面 ================= */
+:root{
+  --bg:#070A2E;--bg2:rgba(7,10,46,.72);--panel:rgba(20,28,98,.58);--panel2:rgba(28,38,122,.62);--line:rgba(126,164,255,.22);
+  --text:#EEF3FF;--mute:#9DAAD9;--gold:#F6C453;--gold2:#FFE7A3;--ok:#3EE0A1;--warn:#FFB648;--bad:#FF5C7C;--blue:#2F8CFF;--violet:#8B5CFF;
+  --metal:linear-gradient(180deg,#FFF8DC 0%,#FFE08A 34%,#E7A83A 56%,#9A5E16 60%,#FFD777 100%);
+  --chrome:linear-gradient(180deg,#FFFFFF 0%,#E3ECFF 46%,#94B4FF 54%,#FFFFFF 100%);
+}
+body{background:radial-gradient(1000px 560px at 8% -12%,rgba(139,92,255,.38),transparent 62%),radial-gradient(900px 620px at 100% -6%,rgba(47,140,255,.3),transparent 60%),var(--bg);
+  font-family:"Noto Sans TC",system-ui,"Microsoft JhengHei","PingFang TC",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto 0;height:62vh;background:url(kv.jpg) center 30%/cover;opacity:.14;filter:blur(10px) saturate(1.25);
+  -webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent);pointer-events:none;z-index:-1}
+body[data-view=display]::before{display:none}
+.top{background:rgba(7,10,46,.84);border-bottom:1px solid rgba(246,196,83,.28)}
+.top .t{display:inline-block;font-weight:900;font-size:18px;font-style:italic;transform:skewX(-6deg);background:var(--metal);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 #3a1d00)}
+.card{background:linear-gradient(180deg,rgba(26,34,112,.62),rgba(13,18,68,.66));border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+button{background:rgba(30,40,124,.6);border-color:rgba(126,164,255,.3)}
+button:hover:not(:disabled){border-color:var(--gold)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.pri,.btnlike{background:linear-gradient(180deg,#FFEBB0,#F6C453 46%,#D7932A);color:#2a1700;border:1px solid #FFD978;box-shadow:0 4px 18px rgba(246,196,83,.22)}
+button.ok{background:linear-gradient(180deg,#7CF2C4,#2FCB8C);color:#032016;border-color:#7CF2C4}
+input,select,textarea{background:rgba(7,10,46,.72);border-color:rgba(126,164,255,.26)}
+.chip{background:rgba(30,40,124,.55);border-color:rgba(126,164,255,.3)}
+.tabs{gap:2px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tabs button{border:0;border-radius:0;padding:10px 14px;background:transparent;color:var(--mute)}
+.tabs button.act{background:transparent;color:var(--gold);box-shadow:inset 0 -3px 0 var(--gold);font-weight:800}
+.seg{border-color:rgba(126,164,255,.3);background:rgba(7,10,46,.5)}
+.seg button.act{background:linear-gradient(180deg,#FFEBB0,#F6C453 46%,#D7932A);color:#2a1700}
+.jcard,.qp,.grp,.asset,.qt,.flow-it{background:rgba(7,10,46,.55)}
+.bar{background:rgba(7,10,46,.7)}.bar i{background:linear-gradient(90deg,var(--blue),var(--violet),var(--gold))}
+.empty{border-color:rgba(126,164,255,.3)}
+/* 身分選擇 */
+.hero{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(246,196,83,.35);box-shadow:0 20px 60px rgba(47,140,255,.25);margin-bottom:22px;aspect-ratio:16/9;max-height:46vh;width:100%}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.picker .seat{background:linear-gradient(180deg,rgba(26,34,112,.7),rgba(13,18,68,.72))}
+.picker .seat .sn{color:var(--gold)}
+/* 評審 */
+.stage .big-no,.total b,.jcard .jt,.avg b{display:inline-block;font-family:"Saira","Noto Sans TC",sans-serif;font-style:italic;font-weight:900;transform:skewX(-6deg);background:var(--metal);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #3a1d00)}
+.stage .song{color:var(--gold2)}
+.stage .big-no{font-size:110px;margin-top:6px}
+
+/* ================= SuperStar 主視覺：大螢幕 ================= */
+.scr{font-family:"Noto Sans TC",system-ui,"Microsoft JhengHei",sans-serif}
+.eyebrow{text-transform:none;letter-spacing:.2em}
+.scr.th-star{--sa:#F6C453;--sa2:#FFE7A3;--sb:#070A2E;--st:#EEF3FF;--sm:rgba(214,224,255,.68);--sl:rgba(120,170,255,.3);--g1:rgba(139,92,255,.5);--g2:rgba(47,140,255,.38)}
+.th-star .scr-bg img{filter:blur(1.1cqw) saturate(1.25)}
+.th-star .scr-bg::before{content:"";position:absolute;left:50%;bottom:-30%;width:180cqw;height:180cqw;transform:translateX(-50%);z-index:1;opacity:.28;mix-blend-mode:screen;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(120,180,255,.0) 0deg 9deg,rgba(120,180,255,.55) 10deg,rgba(120,180,255,0) 12deg 22deg,rgba(190,120,255,.5) 23deg,rgba(190,120,255,0) 25deg 34deg);
+  -webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 70%);mask-image:radial-gradient(closest-side,#000 20%,transparent 70%);animation:sweep 40s linear infinite}
+@keyframes sweep{to{transform:translateX(-50%) rotate(360deg)}}
+.th-star .scr-bg .glow,.th-star .scr-bg .dim{z-index:0}
+.th-star .scr-head{border-bottom:1px solid rgba(246,196,83,.25);background:linear-gradient(180deg,rgba(7,10,46,.8),rgba(7,10,46,0))}
+.th-star .hd-l span{display:inline-block;font-weight:900;font-style:italic;transform:skewX(-6deg);background:var(--metal);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:1.7cqw}
+.th-star .scr-tick{background:rgba(7,10,46,.82);border-top:.2cqh solid rgba(246,196,83,.6)}
+.th-star .tk-label{background:linear-gradient(180deg,#FFEBB0,#F6C453 46%,#D7932A);color:#2a1700}
+/* 金屬金字：主視覺唯一的大膽元素 */
+.th-star .big-title,.th-star .sc-board h2,.th-star .sc-lineup h2,.th-star .sc-qual h2,.th-star .cur-no{display:inline-block;font-style:italic;transform:skewX(-7deg);background:var(--metal);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0;
+  filter:drop-shadow(0 .3cqw 0 #3a1d00) drop-shadow(0 0 2.4cqw rgba(246,196,83,.35))}
+.th-star .cur-no{font-family:"Saira","Noto Sans TC",sans-serif;font-weight:900;letter-spacing:-.03em}
+.th-star .cur-name{display:inline-block;font-style:italic;transform:skewX(-6deg);background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .3cqw 0 #0b1a6b) drop-shadow(0 0 2cqw rgba(47,140,255,.4))}
+.th-star .bd-rk,.th-star .lu-no,.th-star .qg-it span,.th-star .bd-sc{font-family:"Saira","Noto Sans TC",sans-serif;font-style:italic}
+.th-star .bd-row,.th-star .lu-row,.th-star .qg-it{background:linear-gradient(90deg,rgba(22,32,118,.78),rgba(22,32,118,.38));border:1px solid rgba(110,170,255,.38);box-shadow:inset 0 0 2cqw rgba(47,140,255,.16)}
+.th-star .bd-row.r1{background:linear-gradient(90deg,rgba(246,196,83,.32),rgba(22,32,118,.4));border-color:#F6C453}
+.th-star .lu-row.now{background:linear-gradient(90deg,rgba(246,196,83,.26),rgba(22,32,118,.4));border-color:#F6C453}
+.th-star .qg-it{border-color:rgba(246,196,83,.45)}
+.th-star .qg-h{color:var(--sa2)}
+.th-star .cur-song .note{background:linear-gradient(180deg,#6FB6FF,#2F6BFF);color:#fff}
+.cur-meta{display:flex;align-items:center;gap:1.2cqw;margin-bottom:3cqh;font-size:1.5cqw}
+.cur-tag{border:1px solid var(--sa);color:var(--sa);border-radius:99px;padding:.5cqh 1.4cqw;font-weight:700;letter-spacing:.12em}
+.cur-tag.ghost{border-color:var(--sl);color:var(--st)}
+.cur-of{color:var(--sm);letter-spacing:.1em}
+.sc-board.noscore .bd-row{grid-template-columns:6.5cqw 1fr}
+/* 主視覺全螢幕待機 */
+.sc-kv{position:absolute;inset:0;background:#070A2E}
+.sc-kv img{width:100%;height:100%;object-fit:cover;display:block}
+.kv-sub{position:absolute;left:50%;bottom:5cqh;transform:translateX(-50%);padding:1.4cqh 3.4cqw;border-radius:99px;font-size:2.1cqw;font-weight:700;letter-spacing:.12em;white-space:nowrap;
+  background:rgba(7,10,46,.72);border:1px solid rgba(246,196,83,.55);color:#FFF1C9;backdrop-filter:blur(.6cqw)}
+.scr.th-star:has(.sc-kv) .scr-head{display:none}
+/* 宣傳看板 */
+.sc-promo{width:100%;display:flex;flex-direction:column;align-items:center}
+.sc-promo.has-img{display:grid;grid-template-columns:1fr 1fr;gap:5cqw;align-items:center;text-align:left}
+.pr-frame{border-radius:1.4cqw;overflow:hidden;border:.2cqw solid rgba(246,196,83,.6);box-shadow:0 0 4cqw rgba(47,140,255,.35);aspect-ratio:16/10;background:#000}
+.pr-img{width:100%;height:100%;object-fit:contain;display:block}
+.pr-lines{list-style:none;padding:0;margin:4cqh 0 0;font-size:2.4cqw;line-height:1.5}
+.pr-lines li{padding-left:3cqw;position:relative;margin-top:1.4cqh}
+.pr-lines li::before{content:"✦";position:absolute;left:0;color:var(--sa)}
+.sc-promo:not(.has-img) .pr-lines{display:inline-block;text-align:left}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
 @media(max-width:860px){.grid2{grid-template-columns:1fr}.crit{grid-template-columns:1fr 80px}.crit input[type=range]{grid-column:1/-1;order:3}}
 </style>
 </head>
@@ -312,24 +406,24 @@ function saveMe() { LS.set('sc_label', me.label); LS.set('sc_role', me.role); LS
 
 /* ================= 比賽資料 ================= */
 const DISPLAY_DEFAULT = () => ({
-  scene: 'standby', theme: 'gold', bg: null, bgDim: 80,
+  scene: 'standby', theme: 'star', bg: 'kv', bgDim: 78,
   header: { on: true, left: '', right: '' },
   ticker: { on: false, label: '最新消息', text: '', speed: 'normal' },
   logo: { id: null, on: false },
-  standby: { label: 'Welcome', sub: '' },
-  poster: { id: null, fit: 'contain', clean: true },
+  standby: { kv: true, label: '', sub: '' },
+  poster: { id: 'kv', fit: 'cover', clean: true },
+  promo: { label: '', title: '歡迎蒞臨', body: '比賽進行中請將手機調為靜音\n拍照請勿使用閃光燈', img: null },
   current: { progress: true },
-  score: { detail: true },
-  board: { rid: '', group: '', top: 10, hide: 0, song: true },
+  board: { rid: '', group: '', top: 10, hide: 0, song: true, score: false },
   qualify: { rid: '', song: false },
   lineup: { count: 8 },
-  msg: { label: 'Intermission', title: '中場休息', sub: '比賽將於 15 分鐘後繼續' }
+  msg: { label: '', title: '中場休息', sub: '比賽將於 15 分鐘後繼續' }
 });
 const ROUND_NAMES = ['初賽', '複賽', '決賽'];
-const ROUND_DEFAULT = i => ({ name: ROUND_NAMES[i] || `第 ${i + 1} 輪`, contestants: [], current: null, advance: i === 0 ? 5 : 0, advMode: 'group', advOrder: 'reverse', keepSong: false, auto: true, carry: 0 });
+const ROUND_DEFAULT = i => ({ name: ROUND_NAMES[i] || `第 ${i + 1} 輪`, contestants: [], current: null, advance: i === 0 ? 3 : 0, advanceBy: {}, advMode: 'group', advOrder: 'reverse', keepSong: false, auto: true, carry: 0 });
 const GROUP_PRESETS = ['個人組', '團體組'];
 const DEFAULT = () => ({
-  settings: { title: '歌唱比賽', scale: 10, decimals: 2 },
+  settings: { title: '2026 瑞昱之星 SuperStar 歌唱大賽', scale: 10, decimals: 2 },
   criteria: [
     { id: 'c1', name: '音準與節奏', weight: 30 },
     { id: 'c2', name: '音色與技巧', weight: 30 },
@@ -349,7 +443,7 @@ function normalize(s) {
   if (od.mode && !od.scene) od.scene = { current: 'current', score: 'score', results: 'board' }[od.mode] || 'current';
   const disp = Object.assign({}, dd, od);
   for (const k in dd) if (dd[k] && typeof dd[k] === 'object') disp[k] = Object.assign({}, dd[k], od[k] || {});
-  delete disp.mode; s.display = disp;
+  delete disp.mode; if (disp.scene === 'score') disp.scene = 'current'; s.display = disp;
   if (!Array.isArray(s.assets)) s.assets = [];
   // 賽次：每個賽次有自己的名單與目前選手；S.contestants / S.current 永遠指向「進行中」的賽次
   if (!s.rounds || typeof s.rounds !== 'object' || Array.isArray(s.rounds)) s.rounds = {};
@@ -428,11 +522,16 @@ function rankRound(rid, group, exact) {
 }
 const ranking = group => rankRound(S.round, group);
 // 晉級名單：依設定取總排名或各組前 N 名；卡在最後名額同分者一併晉級
+const groupsOf = r => { const g = [...new Set(r.contestants.map(c => c.group || ''))]; return g.length ? g : [...GROUP_PRESETS]; };
+// 各組晉級名額：分組模式下每組可各自設定，沒設定時用預設名額
+const quotaOf = (r, g) => Math.max(0, r.advMode === 'group' && g !== null && r.advanceBy && r.advanceBy[g] != null ? +r.advanceBy[g] || 0 : +r.advance || 0);
+const isAdv = rid => { const r = R(rid); return r.advMode === 'group' ? groupsOf(r).some(g => quotaOf(r, g) > 0) : quotaOf(r, null) > 0; };
 function qualifiers(rid) {
-  const r = R(rid), n = +r.advance || 0; if (!n) return [];
+  const r = R(rid); if (!isAdv(rid)) return [];
   const groups = r.advMode === 'group' ? [...new Set(r.contestants.map(c => c.group || ''))] : [null];
   const out = [];
   for (const g of groups) {
+    const n = quotaOf(r, g); if (!n) continue;
     const { scored } = g === null ? rankRound(rid, '') : rankRound(rid, g, true);
     const cut = scored[n - 1];
     out.push(...(cut ? scored.filter(x => x.rank <= cut.rank) : scored));
@@ -647,7 +746,7 @@ function renderTop() {
 /* ---------- 身分選擇 ---------- */
 SKEL.picker = () => `<div class="picker"><section id="pk"></section><section id="pkCloud" style="margin-top:8px"></section></div>`;
 VIEW.picker = () => { put('pk', [S.judges, clients.filter(c => c.device !== me.device).map(c => [c.device, c.label, c.role, c.seat]), S.settings.title, mode], () => `
-  <h1>${esc(S.settings.title)}</h1>
+  <div class="hero"><img src="kv.jpg" alt="${esc(S.settings.title)}"></div>
   <p class="muted">請設定這台電腦的名稱與身分。系統會記住設定，重新整理或重開瀏覽器都不會跑掉。</p>
   ${mode === 'local' ? `<div class="warnbox">目前為 <b>單機模式</b>：資料只在這台電腦的分頁之間同步。要讓多台筆電即時同步，請在下方「雲端同步設定」填入 GitHub Gist，或使用 server.js。</div>` : ''}
   <label class="lbl">這台電腦的名稱（方便管理員辨認）<input id="devLabel" value="${esc(me.label)}" placeholder="例如：筆電A、左側評審桌"></label>
@@ -766,7 +865,7 @@ AV.control = () => {
   const cur = cById(S.current), st = cur ? stOf(cur.id) : 'wait', i = idx(S.current), n = S.contestants.length;
   const done = S.contestants.filter(c => stOf(c.id) === 'locked').length;
   const dm = S.display.scene;
-  const nx = nextRid(S.round), nxN = nx ? R(nx).contestants.length : 0, rDone = roundDone(S.round), adv = +R().advance || 0;
+  const nx = nextRid(S.round), nxN = nx ? R(nx).contestants.length : 0, rDone = roundDone(S.round), adv = isAdv(S.round);
   put('cNow', [cur, st, i, n, done, dm, S.round, S.roundIds.map(rName), nxN, rDone, adv], () => `
     ${rDone ? `<div class="banner-ok">🎉 ${esc(rName())}已全部完成！${adv ? (nxN ? `${esc(rName(nx))}名單已產生（${nxN} 位）<button class="sm" data-act="rdActive" data-r="${nx}">切換到${esc(rName(nx))}</button>` : `<button class="sm pri" data-act="advance" data-r="${S.round}">產生晉級名單</button>`) : '這是最終賽次，可到「成績排名」查看最終名次。'}</div>` : ''}
     <div class="row between"><div class="row"><h3 style="margin:0">目前選手</h3><span class="chip open">🏁 ${esc(rName())}</span></div><span class="muted small">進度：已完成 ${done} / ${n} 位</span></div>
@@ -781,7 +880,7 @@ AV.control = () => {
       <button class="ghost" data-act="setst" data-st="wait" ${!cur || st === 'wait' ? 'disabled' : ''}>設回待評分</button>
     </div>
     <div class="row"><span class="muted small">大螢幕快速切換：</span><div class="seg">
-      ${[['current', '目前選手'], ['score', '選手成績'], ['board', '排行榜'], ['qualify', '晉級名單'], ['poster', '海報']].map(([k, l]) => `<button class="${dm === k ? 'act' : ''}" data-act="goLive" data-s="${k}">${l}</button>`).join('')}
+      ${[['standby', '主視覺'], ['current', '目前選手'], ['lineup', '出場順序'], ['qualify', '晉級名單'], ['promo', '宣傳看板']].map(([k, l]) => `<button class="${dm === k ? 'act' : ''}" data-act="goLive" data-s="${k}">${l}</button>`).join('')}
     </div><button class="ghost sm" data-act="tab" data-tab="stage">導播台 →</button></div>`);
 
   put('cJudges', [S.judges, clients, cur && cur.id, cur ? S.scores[cur.id] : null, S.criteria, S.settings], () => `
@@ -830,12 +929,12 @@ AV.contestants = () => {
 
 /* ---------- 賽程與晉級 ---------- */
 function qualifyPreview(rid) {
-  const r = R(rid), q = new Set(qualifiers(rid).map(x => x.c.id)), n = +r.advance || 0;
+  const r = R(rid), q = new Set(qualifiers(rid).map(x => x.c.id));
   const groups = r.advMode === 'group' ? [...new Set(r.contestants.map(c => c.group || ''))] : [null];
   return groups.map(g => {
     const { rows, scored } = g === null ? rankRound(rid, '') : rankRound(rid, g, true);
-    const qn = scored.filter(x => q.has(x.c.id)).length, tie = qn > n;
-    return `<div class="qp"><div class="row between"><b>${g === null ? '總排名' : esc(g || '未分組')}</b><span class="small muted">取前 ${n} 名・目前晉級 ${qn} 位${tie ? '<span class="warn">（含同分）</span>' : ''}・未評分 ${rows.length - scored.length} 位</span></div>
+    const n = quotaOf(r, g), qn = scored.filter(x => q.has(x.c.id)).length, tie = qn > n;
+    return `<div class="qp"><div class="row between"><b>${g === null ? '總排名' : esc(g || '未分組')}</b><span class="small muted">${n ? `取前 ${n} 名` : '本組不晉級'}・目前晉級 ${qn} 位${tie ? '<span class="warn">（含同分）</span>' : ''}・未評分 ${rows.length - scored.length} 位</span></div>
       <div class="qp-list">${scored.map(x => `<div class="qp-row ${q.has(x.c.id) ? 'in' : ''}"><span class="qp-rk">${x.rank}</span><span class="qp-nm">${esc(x.c.name)}</span><span class="qp-sc">${fmt(x.f)}</span><span class="qp-tag">${q.has(x.c.id) ? '✓ 晉級' : ''}</span></div>`).join('') || '<div class="muted small" style="padding:8px">尚無成績</div>'}</div></div>`;
   }).join('');
 }
@@ -848,17 +947,19 @@ AV.rounds = () => {
     <p class="muted small" style="margin:12px 0 0">每個賽次有自己的名單、曲目與分數。上一賽次完成後，系統會依晉級規則自動產生下一賽次名單。</p>`);
   put('rdCards', [ids, ids.map(id => R(id)), S.scores, S.status, S.round, S.judges, S.criteria, S.settings], () => ids.map((id, i) => {
     const r = R(id), nx = nextRid(id), nxName = nx ? rName(nx) : (ROUND_NAMES[i + 1] || `第 ${i + 2} 輪`), l = r.contestants, d = l.filter(c => stOf(c.id) === 'locked').length;
-    const nxList = nx ? R(nx).contestants.length : 0, adv = +r.advance || 0;
+    const nxList = nx ? R(nx).contestants.length : 0, adv = isAdv(id), grp = r.advMode === 'group';
     return `<section class="card rd ${id === S.round ? 'on' : ''}" style="margin-top:16px">
       <div class="row between"><div class="row"><span class="rd-no">${i + 1}</span><input class="rd-name" id="rdn_${id}" data-rd="${id}" data-f="name" value="${esc(r.name)}">
         ${id === S.round ? '<span class="chip open">● 進行中</span>' : `<button class="sm" data-act="rdActive" data-r="${id}">設為進行中</button>`}</div>
         <div class="row"><span class="muted small">名單 ${l.length} 位・已完成 ${d}/${l.length}</span>${i > 0 ? `<button class="bad sm" data-act="rdDel" data-r="${id}">刪除賽次</button>` : ''}</div></div>
       <div class="rd-set">
-        <label class="lbl">晉級名額<input type="number" min="0" id="rda_${id}" data-rd="${id}" data-f="advance" value="${adv}"><span class="small">0 = 最終賽次，不晉級</span></label>
         <label class="lbl">晉級方式<select data-rd="${id}" data-f="advMode"><option value="group" ${r.advMode === 'group' ? 'selected' : ''}>各組別各取前 N 名</option><option value="overall" ${r.advMode === 'overall' ? 'selected' : ''}>不分組，總排名取前 N 名</option></select></label>
         <label class="lbl">下一賽次出場順序<select data-rd="${id}" data-f="advOrder"><option value="reverse" ${r.advOrder === 'reverse' ? 'selected' : ''}>成績低者先唱（高分壓軸）</option><option value="rank" ${r.advOrder === 'rank' ? 'selected' : ''}>成績高者先唱</option><option value="original" ${r.advOrder === 'original' ? 'selected' : ''}>維持本賽次順序</option></select></label>
         ${i > 0 ? `<label class="lbl">加計${esc(rName(prevRid(id)))}成績<input type="number" min="0" max="100" id="rdc_${id}" data-rd="${id}" data-f="carry" value="${+r.carry || 0}"><span class="small">%（0 = 只看本賽次）</span></label>` : '<div></div>'}
+        ${grp ? '' : `<label class="lbl">總排名取前幾名<input type="number" min="0" id="rda_${id}" data-rd="${id}" data-f="advance" value="${+r.advance || 0}"><span class="small">填 0 代表這是最終賽次</span></label>`}
       </div>
+      ${grp ? `<div class="quota"><div class="small muted" style="margin-bottom:8px">各組晉級名額（全部填 0 代表這是最終賽次）</div><div class="quota-list">${groupsOf(r).map(g => { const tot = l.filter(c => (c.group || '') === g).length;
+        return `<label class="qt"><b>${esc(g || '未分組')}</b><span class="muted small">${tot ? `共 ${tot} ${g === '團體組' ? '組' : '位'}` : '尚無名單'}</span><span class="qt-in">取前<input type="number" min="0" id="rdq_${id}_${esc(g)}" data-rd="${id}" data-f="advanceBy" data-g="${esc(g)}" value="${quotaOf(r, g)}">名</span></label>`; }).join('')}</div></div>` : ''}
       <div class="row">${ck2(id, 'auto', r.auto, '本賽次全部鎖定後，自動產生晉級名單')}${ck2(id, 'keepSong', r.keepSong, '晉級者沿用本賽次曲目')}</div>
       ${adv ? `<div class="qp-wrap">${qualifyPreview(id)}</div>
         <div class="row" style="margin-top:14px"><button class="pri" data-act="advance" data-r="${id}">產生晉級名單 → ${esc(nxName)}</button>
@@ -870,7 +971,7 @@ AV.rounds = () => {
 const ck2 = (rid, f, val, label) => `<label class="ck"><input type="checkbox" data-rd="${rid}" data-f="${f}" ${val ? 'checked' : ''}> ${label}</label>`;
 async function doAdvance(rid, auto) {
   const r = R(rid), q = qualifiers(rid);
-  if (!(+r.advance > 0)) { toast('請先設定晉級名額'); return; }
+  if (!isAdv(rid)) { toast('請先設定晉級名額'); return; }
   if (!q.length) { if (!auto) toast('還沒有成績，無法產生晉級名單'); return; }
   let nid = nextRid(rid), nextName;
   const ops = [];
@@ -942,7 +1043,7 @@ AV.results = () => {
   const rd = R(resRid), groups = [...new Set(rd.contestants.map(c => c.group).filter(Boolean))], carry = +rd.carry > 0 && prevRid(resRid);
   if (resGroup && !groups.includes(resGroup)) resGroup = '';
   put('rsTable', [resRid, rd, S.scores, S.judges, S.criteria, S.settings, S.status, resSort, resGroup, S.round, S.roundIds.map(rName)], () => {
-    const { rows, scored } = rankRound(resRid, resGroup), q = new Set(qualifiers(resRid).map(x => x.c.id)), adv = +rd.advance > 0;
+    const { rows, scored } = rankRound(resRid, resGroup), q = new Set(qualifiers(resRid).map(x => x.c.id)), adv = isAdv(resRid);
     const list = resSort === 'rank' ? [...scored, ...rows.filter(x => x.f == null)] : rows;
     const pr = prevRid(resRid);
     return `<div class="row between"><div class="row"><h3 style="margin:0">成績排名</h3>${roundSeg('resRound', resRid)}</div><div class="row">
@@ -980,7 +1081,9 @@ AV.data = () => put('dtBox', [mode, S.roundIds.map(id => [rName(id), R(id).conte
 /* ---------- 素材（海報、背景、Logo） ---------- */
 let assetVer = 0;
 const assetCache = new Map();
+const KV = { id: 'kv', name: '主視覺（內建）', w: 2576, h: 1449, builtin: true };
 function assetSrc(id) {
+  if (id === 'kv') return 'kv.jpg';
   const v = assetCache.get(id);
   if (v && v.startsWith('data:')) return v;
   if (v === undefined) {
@@ -1089,10 +1192,10 @@ async function uploadAssets(files) {
 }
 
 /* ---------- 大螢幕畫面引擎（大螢幕、導播台預覽與播出監看共用） ---------- */
-const SCENES = [['standby', '待機畫面', '◎'], ['poster', '海報', '▣'], ['current', '目前選手', '♪'], ['score', '選手成績', '★'], ['board', '排行榜', '♛'], ['lineup', '出場順序', '☰'], ['qualify', '晉級名單', '➚'], ['message', '自訂訊息', '✎'], ['black', '黑畫面', '■']];
+const SCENES = [['standby', '待機畫面', '◎'], ['poster', '海報', '▣'], ['current', '目前選手', '♪'], ['board', '排行榜', '♛'], ['lineup', '出場順序', '☰'], ['qualify', '晉級名單', '➚'], ['promo', '宣傳看板', '✦'], ['message', '自訂訊息', '✎'], ['black', '黑畫面', '■']];
 const sceneName = k => (SCENES.find(s => s[0] === k) || [0, k])[1];
-const THEMES = [['gold', '金色舞台'], ['blue', '科技藍'], ['red', '典禮紅'], ['light', '簡約白']];
-const MSG_PRESETS = [['Intermission', '中場休息', '比賽將於 15 分鐘後繼續'], ['Please wait', '成績統計中', '評審正在進行最後確認，請稍候'], ['Coming up', '比賽即將開始', '請觀眾就座，並將手機調為靜音'], ['Awards', '頒獎典禮', '恭喜所有得獎者'], ['Thank you', '感謝您的蒞臨', '我們明年見']];
+const THEMES = [['star', 'SuperStar 主視覺'], ['gold', '金色舞台'], ['blue', '科技藍'], ['red', '典禮紅'], ['light', '簡約白']];
+const MSG_PRESETS = [['', '中場休息', '比賽將於 15 分鐘後繼續'], ['', '評審討論中', '成績將於頒獎典禮以信封揭曉'], ['', '比賽即將開始', '請觀眾就座，並將手機調為靜音'], ['', '頒獎典禮', '恭喜所有得獎者'], ['', '感謝您的蒞臨', '我們明年見']];
 const pad2 = n => String(n).padStart(2, '0');
 const screenSkel = pf => `<div class="scr" id="${pf}"><div class="scr-bg" id="${pf}Bg"></div><div class="scr-head" id="${pf}Head"></div><div class="scr-body" id="${pf}Body"></div><div class="scr-tick" id="${pf}Tick"></div></div>`;
 function img(id, cls) { const s = id ? assetSrc(id) : ''; return s ? `<img${cls ? ` class="${cls}"` : ''} src="${s}" alt="">` : ''; }
@@ -1104,7 +1207,7 @@ function paintScreen(pf, d) {
   put(pf + 'Bg', [d.bg, d.bgDim, assetVer], () => `<div class="glow"></div>${d.bg ? img(d.bg) + `<div class="dim" style="opacity:${(+d.bgDim || 0) / 100}"></div>` : ''}`);
   put(pf + 'Head', [d.header, d.logo, S.settings.title, assetVer], () => !d.header.on ? '' :
     `<div class="hd-l">${d.logo.on ? img(d.logo.id) : ''}<span>${esc(d.header.left || S.settings.title)}</span></div><div class="hd-r">${esc(d.header.right)}</div>`);
-  const live = ['current', 'score', 'board', 'lineup', 'qualify'].includes(d.scene);
+  const live = ['current', 'board', 'lineup', 'qualify'].includes(d.scene);
   const prevHide = root._hide; root._hide = d.board.hide;
   const changed = root._scene !== d.scene; root._scene = d.scene;
   put(pf + 'Body', [d.scene, d.scene === 'message' ? d.msg : d[d.scene], live ? [S.round, S.roundIds.map(id => R(id)), S.scores, S.status, S.judges, S.criteria, S.settings] : [S.settings.title], d.logo, assetVer], () => sceneHTML(d, prevHide));
@@ -1112,9 +1215,10 @@ function paintScreen(pf, d) {
   put(pf + 'Tick', [d.ticker], () => d.ticker.on && d.ticker.text ? `<div class="tk-label">${esc(d.ticker.label || '最新消息')}</div><div class="tk-track"><span style="animation-duration:${Math.max(12, d.ticker.text.length * ({ slow: .5, normal: .34, fast: .22 }[d.ticker.speed] || .34) + 8)}s">${esc(d.ticker.text)}</span></div>` : '');
 }
 function standbyHTML(d, sub) {
+  if (d.theme === 'star' && d.standby.kv && !sub) return `<div class="sc-kv"><img src="kv.jpg" alt="2026 瑞昱之星 SuperStar 歌唱大賽">${d.standby.sub ? `<div class="kv-sub">${esc(d.standby.sub)}</div>` : ''}</div>`;
   const logo = d.logo.on && d.logo.id ? img(d.logo.id, 'st-logo') : '';
   sub = sub || d.standby.sub;
-  return `<div class="sc-center">${logo}<div class="eyebrow">${esc(d.standby.label || 'Welcome')}</div><h1 class="big-title">${esc(S.settings.title)}</h1>${sub ? `<div class="subt">${esc(sub)}</div>` : ''}<div class="rule"></div></div>`;
+  return `<div class="sc-center">${logo}${d.standby.label ? `<div class="eyebrow">${esc(d.standby.label)}</div>` : ''}<h1 class="big-title">${esc(S.settings.title)}</h1>${sub ? `<div class="subt">${esc(sub)}</div>` : ''}<div class="rule"></div></div>`;
 }
 function sceneHTML(d, prevHide) {
   const cur = cById(S.current), i = idx(S.current);
@@ -1128,34 +1232,30 @@ function sceneHTML(d, prevHide) {
       return `<div class="sc-center">${d.msg.label ? `<div class="eyebrow">${esc(d.msg.label)}</div>` : ''}<h1 class="big-title">${esc(d.msg.title)}</h1>${d.msg.sub ? `<div class="subt">${esc(d.msg.sub)}</div>` : ''}<div class="rule"></div></div>`;
     case 'current': {
       if (!cur) return standbyHTML(d, '比賽即將開始');
-      return `<div class="sc-current"><div class="eyebrow">Now on stage<span class="cur-tag">${esc(rName())}・第 ${i + 1} 位${cur.group ? '・' + esc(cur.group) : ''}</span></div>
+      return `<div class="sc-current"><div class="cur-meta"><span class="cur-tag">${esc(rName())}</span>${cur.group ? `<span class="cur-tag ghost">${esc(cur.group)}</span>` : ''}<span class="cur-of">第 ${i + 1} 位 / 共 ${S.contestants.length} 位</span></div>
         <div class="cur-grid"><div class="cur-no">${pad2(i + 1)}</div><div class="cur-info"><div class="cur-name">${esc(cur.name)}</div>
         ${cur.song ? `<div class="cur-song"><span class="note">♪</span><span>${esc(cur.song)}</span></div>` : ''}${cur.artist ? `<div class="cur-artist">${esc(cur.artist)}</div>` : ''}</div></div>
         ${d.current.progress ? `<div class="jprog">${S.judges.map(j => `<div class="jp ${(S.scores[cur.id] || {})[j.id] ? 'ok' : ''}"><i></i><span>${esc(j.name)}</span></div>`).join('')}</div>` : ''}</div>`;
     }
-    case 'score': {
-      if (!cur) return standbyHTML(d, '比賽即將開始');
-      const r = result(cur.id), st = stOf(cur.id), fin = finalScore(S.round, cur), carry = +R().carry > 0 && prevRid(S.round);
-      return `<div class="sc-score"><div class="eyebrow">Result・${esc(rName())}・第 ${i + 1} 位</div><div class="sc-name">${esc(cur.name)}</div>${cur.song ? `<div class="sc-song">♪ ${esc(cur.song)}</div>` : ''}
-        ${st === 'locked' && r.avg != null
-          ? `<div class="sc-val">${fmt(r.avg)}<small> / ${scale()}</small></div>${carry && fin != null ? `<div class="sc-carry">加計${esc(rName(prevRid(S.round)))}成績後　總成績 <b>${fmt(fin)}</b></div>` : ''}${d.score.detail ? `<div class="sc-det">${S.judges.map((j, k) => `<div><span>${esc(j.name)}</span><b>${fmt(r.per[k])}</b></div>`).join('')}</div>` : ''}`
-          : `<div class="sc-wait"><span class="spin"></span>評審評分中　${r.n} / ${S.judges.length}</div>`}</div>`;
+    case 'promo': {
+      const p = d.promo, im = p.img ? img(p.img, 'pr-img') : '', lines = (p.body || '').split(/\n/).map(x => x.trim()).filter(Boolean);
+      return `<div class="sc-promo ${im ? 'has-img' : ''}">${im ? `<div class="pr-frame">${im}</div>` : ''}<div class="pr-text">${p.label ? `<div class="eyebrow">${esc(p.label)}</div>` : ''}<h1 class="big-title">${esc(p.title)}</h1>${lines.length ? `<ul class="pr-lines">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}</div></div>`;
     }
     case 'board': {
       const b = d.board, brid = S.rounds[b.rid] ? b.rid : S.round, { scored } = rankRound(brid, b.group), list = b.top ? scored.slice(0, b.top) : scored;
-      if (!list.length) return `<div class="sc-center"><div class="eyebrow">Ranking</div><h1 class="big-title">成績統計中</h1><div class="rule"></div></div>`;
+      if (!list.length) return `<div class="sc-center"><h1 class="big-title">成績統計中</h1><div class="rule"></div></div>`;
       const n = list.length, two = n > 10, cls = two ? 'two dense' : n > 6 ? 'dense' : '';
-      return `<div class="sc-board"><div class="eyebrow">Ranking</div><h2>${esc(rName(brid))}・${b.group ? esc(b.group) + '・' : ''}成績排行榜</h2>
+      return `<div class="sc-board ${b.score ? '' : 'noscore'}"><h2>${esc(rName(brid))}・${b.group ? esc(b.group) + '・' : ''}成績排行榜</h2>
         <div class="bd-list ${cls}" ${two ? `style="grid-template-rows:repeat(${Math.ceil(n / 2)},auto)"` : ''}>${list.map((x, k) => {
           const m = x.rank <= b.hide, rv = !m && prevHide != null && x.rank <= prevHide && x.rank > b.hide;
           return `<div class="bd-row ${x.rank <= 3 ? 'r' + x.rank : ''} ${m ? 'masked' : ''} ${rv ? 'reveal' : ''}" style="animation-delay:${rv ? 0 : (k * 0.07).toFixed(2)}s">
-            <div class="bd-rk">${x.rank}</div><div class="bd-nm">${m ? '？ ？ ？' : esc(x.c.name)}${b.song && !m ? `<small>${esc(x.c.song || '')}</small>` : ''}</div><div class="bd-sc">${m ? '— —' : fmt(x.r.avg)}</div></div>`;
+            <div class="bd-rk">${x.rank}</div><div class="bd-nm">${m ? '？ ？ ？' : esc(x.c.name)}${b.song && !m ? `<small>${esc(x.c.song || '')}</small>` : ''}</div>${b.score ? `<div class="bd-sc">${m ? '— —' : fmt(x.f)}</div>` : ''}</div>`;
         }).join('')}</div></div>`;
     }
     case 'lineup': {
       const cnt = d.lineup.count || 8, start = Math.max(0, Math.min(i < 0 ? 0 : i - 1, S.contestants.length - cnt)), list = S.contestants.slice(start, start + cnt);
       if (!list.length) return standbyHTML(d);
-      return `<div class="sc-lineup"><div class="eyebrow">Running order</div><h2>${esc(rName())}出場順序</h2><div class="lu-list">${list.map((c, k) => {
+      return `<div class="sc-lineup"><h2>${esc(rName())}出場順序</h2><div class="lu-list">${list.map((c, k) => {
         const j = start + k, cls = j === i ? 'now' : (j < i || stOf(c.id) === 'locked') ? 'done' : j === i + 1 ? 'next' : '';
         return `<div class="lu-row ${cls}"><span class="lu-no">${pad2(j + 1)}</span><span class="lu-nm">${esc(c.name)}</span><span class="lu-song">${c.song ? '♪ ' + esc(c.song) : ''}</span><span class="lu-st">${{ now: '演唱中', done: '已完成', next: '下一位' }[cls] || ''}</span></div>`;
       }).join('')}</div></div>`;
@@ -1163,9 +1263,9 @@ function sceneHTML(d, prevHide) {
     case 'qualify': {
       const qid = S.rounds[d.qualify.rid] ? d.qualify.rid : (S.roundIds.indexOf(S.round) > 0 && R().contestants.length ? S.round : nextRid(S.round));
       const list = qid ? R(qid).contestants : [];
-      if (!list.length) return `<div class="sc-center"><div class="eyebrow">Qualified</div><h1 class="big-title">晉級名單即將公布</h1><div class="rule"></div></div>`;
+      if (!list.length) return `<div class="sc-center"><h1 class="big-title">晉級名單即將公布</h1><div class="rule"></div></div>`;
       const groups = [...new Set(list.map(c => c.group || ''))], n = list.length, cols = n > 12 ? 4 : n > 6 ? 3 : 2;
-      return `<div class="sc-qual"><div class="eyebrow">Congratulations</div><h2>晉級${esc(rName(qid))}名單</h2>
+      return `<div class="sc-qual"><h2>恭喜晉級${esc(rName(qid))}</h2>
         ${groups.map(g => `<div class="qg">${groups.length > 1 || g ? `<div class="qg-h">${esc(g || '未分組')}<span>${list.filter(c => (c.group || '') === g).length} 位</span></div>` : ''}
           <div class="qg-list" style="grid-template-columns:repeat(${cols},1fr)">${list.filter(c => (c.group || '') === g).map((c, k) => `<div class="qg-it" style="animation-delay:${(k * 0.06).toFixed(2)}s"><span>${pad2(list.indexOf(c) + 1)}</span><b>${esc(c.name)}</b>${d.qualify.song && c.song ? `<small>♪ ${esc(c.song)}</small>` : ''}</div>`).join('')}</div></div>`).join('')}</div>`;
     }
@@ -1199,20 +1299,22 @@ const ck = (path, val, label) => `<label class="ck"><input type="checkbox" data-
 const tx = (path, val, label, ph) => `<label class="lbl">${label}<input data-pv="${path}" value="${esc(val)}" placeholder="${esc(ph || '')}"></label>`;
 const sl = (path, val, label, opts, num) => `<label class="lbl">${label}<select data-pv="${path}" ${num ? 'data-pvt="num"' : ''}>${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(val ?? '') ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></label>`;
 const sg = (path, val, opts) => `<div class="seg">${opts.map(([v, l]) => `<button class="${val === v ? 'act' : ''}" data-act="pvSet" data-k="${path}" data-v='${JSON.stringify(v)}'>${l}</button>`).join('')}</div>`;
+const allAssets = () => [KV, ...S.assets];
 function assetPicker(path, val, none) {
-  return `<div class="apick">${none ? `<button class="ap ${!val ? 'on' : ''}" data-act="pvSet" data-k="${path}" data-v="null"><span>無</span></button>` : ''}${S.assets.map(a => `<button class="ap ${val === a.id ? 'on' : ''}" data-act="pvSet" data-k="${path}" data-v='"${a.id}"' title="${esc(a.name)}">${img(a.id) || '<span>載入中</span>'}</button>`).join('')}${S.assets.length ? '' : '<span class="muted small">素材庫還沒有圖片，請到下方上傳</span>'}</div>`;
+  return `<div class="apick">${none ? `<button class="ap ${!val ? 'on' : ''}" data-act="pvSet" data-k="${path}" data-v="null"><span>無</span></button>` : ''}${allAssets().map(a => `<button class="ap ${val === a.id ? 'on' : ''}" data-act="pvSet" data-k="${path}" data-v='"${a.id}"' title="${esc(a.name)}">${img(a.id) || '<span>載入中</span>'}</button>`).join('')}</div>`;
 }
 function sceneSettings(p) {
   const h = `<h3>場景設定：${sceneName(p.scene)}</h3>`;
   switch (p.scene) {
-    case 'standby': return h + tx('standby.label', p.standby.label, '上方小標（英文效果較好）', 'WELCOME') + tx('standby.sub', p.standby.sub, '副標題（例如日期、地點）', '2026／11／15・市民活動中心') + '<p class="muted small">主標題使用「計分設定」中的比賽名稱；在右側開啟 Logo 後，會顯示在標題上方。</p>';
+    case 'standby': return h + (p.theme === 'star' ? ck('standby.kv', p.standby.kv, '使用 SuperStar 主視覺全螢幕') : '') + tx('standby.sub', p.standby.sub, '日期、地點等說明（顯示在畫面下方）', '11 月 15 日（六）13:30・瑞昱大禮堂') + (p.theme === 'star' && p.standby.kv ? '' : tx('standby.label', p.standby.label, '標題上方的小字（可留空）')) + '<p class="muted small">未使用主視覺時，標題使用「計分設定」中的比賽名稱。</p>';
     case 'poster': return h + '<div class="lbl">選擇海報</div>' + assetPicker('poster.id', p.poster.id) + `<div class="row" style="margin-top:14px">${sg('poster.fit', p.poster.fit, [['contain', '完整顯示'], ['cover', '滿版裁切']])}${ck('poster.clean', p.poster.clean, '純海報（隱藏標題列與跑馬燈）')}</div>`;
     case 'current': return h + ck('current.progress', p.current.progress, '顯示評審送分進度') + '<p class="muted small">內容自動跟隨「比賽控制」的目前選手，切換下一位時大螢幕會同步更新。</p>';
-    case 'score': return h + ck('score.detail', p.score.detail, '顯示各評審分數') + '<p class="muted small">管理員按下「鎖定分數」後才會揭曉成績，在那之前顯示評分進度。</p>';
+    case 'promo': return h + tx('promo.title', p.promo.title, '標題') + `<label class="lbl">內容（每行一項）<textarea data-pv="promo.body" rows="4">${esc(p.promo.body)}</textarea></label>` + tx('promo.label', p.promo.label, '標題上方的小字（可留空）', '例如：感謝贊助') + '<div class="lbl">搭配圖片（可不選）</div>' + assetPicker('promo.img', p.promo.img, true) + '<p class="muted small" style="margin-top:10px">適合放贊助單位、活動須知、投票或抽獎資訊。</p>';
     case 'board': {
       const groups = [...new Set(S.contestants.map(c => c.group).filter(Boolean))], hide = S.display.board.hide, live = S.display.scene === 'board';
       return h + sl('board.rid', p.board.rid, '賽次', [['', `進行中的賽次（${rName()}）`], ...S.roundIds.map(id => [id, rName(id)])]) + `<div class="grid2" style="gap:12px">${sl('board.group', p.board.group, '組別', [['', '全部組別'], ...groups.map(g => [g, g])])}${sl('board.top', p.board.top, '顯示名次', [[3, '前 3 名'], [5, '前 5 名'], [8, '前 8 名'], [10, '前 10 名'], [0, '全部']], true)}</div>
-        ${ck('board.song', p.board.song, '顯示演唱曲目')}
+        <div class="row">${ck('board.song', p.board.song, '顯示演唱曲目')}${ck('board.score', p.board.score, '顯示分數')}</div>
+        <p class="muted small" style="margin:0 0 6px">成績以信封揭曉時，建議不要勾選「顯示分數」，大螢幕只顯示名次與姓名。</p>
         <div class="reveal-box"><b>🏆 名次揭曉</b><p class="muted small">先遮住前三名，再從第 3 名開始一名一名揭曉。這裡的按鈕會直接作用在大螢幕上。</p>
         <div class="row"><button data-act="reveal" data-v="3">遮住前 3 名</button><button class="pri" data-act="reveal" data-v="-1" ${hide > 0 ? '' : 'disabled'}>揭曉下一名${hide > 0 ? `（第 ${hide} 名）` : ''}</button><button class="ghost" data-act="reveal" data-v="0">全部顯示</button></div>
         ${live ? '' : '<p class="warn small" style="margin:10px 0 0">大螢幕目前不在排行榜，請先按 TAKE 播出排行榜。</p>'}</div>`;
@@ -1225,8 +1327,8 @@ function sceneSettings(p) {
   return h;
 }
 function globalSettings(p) {
-  return `<h3>整體外觀</h3>
-    <div class="lbl">配色主題</div>${sg('theme', p.theme, THEMES)}
+  return `<div class="row between"><h3 style="margin:0">整體外觀</h3><button class="sm" data-act="kvPreset">套用 SuperStar 主視覺</button></div>
+    <div class="lbl" style="margin-top:14px">配色主題</div>${sg('theme', p.theme, THEMES)}
     <div class="lbl" style="margin-top:16px">背景圖片</div>${assetPicker('bg', p.bg, true)}
     ${p.bg ? `<label class="lbl" style="margin-top:10px">背景暗化 ${p.bgDim}%（數字越大文字越清楚）<input type="range" min="0" max="95" step="5" data-pv="bgDim" data-pvt="num" value="${p.bgDim}"></label>` : ''}
     <hr>
@@ -1242,10 +1344,9 @@ function assetsHTML() {
   const uses = id => { const d = S.display, out = []; if (d.poster.id === id || (pv && pv.poster.id === id)) out.push('海報'); if (d.bg === id || (pv && pv.bg === id)) out.push('背景'); if (d.logo.id === id || (pv && pv.logo.id === id)) out.push('Logo'); return out; };
   return `<div class="row between"><h3>素材庫（海報・背景・Logo）</h3><label class="btnlike">⬆ 上傳圖片<input type="file" id="assetFile" accept="image/*" multiple hidden></label></div>
     <p class="muted small">支援 JPG／PNG／WebP，可一次選多張。系統會自動壓縮成適合投影的大小（最長邊 1920px），海報建議使用 16:9 橫式。${mode === 'gist' ? '雲端模式下，圖片存放在系統自動建立的另一個 secret Gist。' : ''}</p>
-    <div class="assets">${S.assets.map(a => { const u = uses(a.id); return `<div class="asset ${u.length ? 'on' : ''}"><div class="th">${img(a.id) || '載入中…'}</div>
-      <div class="meta"><div class="nm" title="${esc(a.name)}">${esc(a.name)}</div><div class="muted">${a.w}×${a.h}・${Math.round(a.size * 0.75 / 1024)} KB${u.length ? `・<span class="okc">${u.join('、')}</span>` : ''}</div></div>
-      <div class="acts"><button data-act="assetUse" data-u="poster" data-id="${a.id}">當海報</button><button data-act="assetUse" data-u="bg" data-id="${a.id}">當背景</button><button data-act="assetUse" data-u="logo" data-id="${a.id}">當 Logo</button><button class="bad" data-act="assetDel" data-id="${a.id}">刪除</button></div></div>`; }).join('')
-      || '<div class="empty" style="grid-column:1/-1">還沒有素材，請上傳活動海報或 Logo</div>'}</div>`;
+    <div class="assets">${allAssets().map(a => { const u = uses(a.id); return `<div class="asset ${u.length ? 'on' : ''}"><div class="th">${img(a.id) || '載入中…'}</div>
+      <div class="meta"><div class="nm" title="${esc(a.name)}">${esc(a.name)}</div><div class="muted">${a.w}×${a.h}${a.builtin ? '' : `・${Math.round(a.size * 0.75 / 1024)} KB`}${u.length ? `・<span class="okc">${u.join('、')}</span>` : ''}</div></div>
+      <div class="acts"><button data-act="assetUse" data-u="poster" data-id="${a.id}">當海報</button><button data-act="assetUse" data-u="bg" data-id="${a.id}">當背景</button><button data-act="assetUse" data-u="logo" data-id="${a.id}">當 Logo</button>${a.builtin ? '' : `<button class="bad" data-act="assetDel" data-id="${a.id}">刪除</button>`}</div></div>`; }).join('')}</div>`;
 }
 AV.stage = () => {
   if (!pv) pv = clone(S.display);
@@ -1299,13 +1400,14 @@ const ACT = {
     const cid = S.current; if (!cid) return; const v = b.dataset.st;
     if (v === 'locked') { const r = result(cid); if (r.n < S.judges.length && !confirm(`還有 ${S.judges.length - r.n} 位評審尚未送出分數，確定要鎖定嗎？`)) return; }
     const rid = S.round, r = R(rid);
-    const willFinish = v === 'locked' && r.auto && +r.advance > 0 && r.contestants.every(c => c.id === cid || stOf(c.id) === 'locked');
+    const willFinish = v === 'locked' && r.auto && isAdv(rid) && r.contestants.every(c => c.id === cid || stOf(c.id) === 'locked');
     send([v === 'wait' ? { op: 'del', path: ['status', cid] } : { op: 'set', path: ['status', cid], value: v }]).then(ok => { if (ok && willFinish) doAdvance(rid, true); });
   },
   goLive(b) { const k = b.dataset.s; if (pv) pv.scene = k; send([{ op: 'set', path: ['display', 'scene'], value: k }]); },
   scene(b) { setPv('scene', b.dataset.s); },
   pvSet(b) { setPv(b.dataset.k, JSON.parse(b.dataset.v)); },
   take() { if (!pv) return; clearTimeout(takeT); send([{ op: 'set', path: ['display'], value: clone(pv) }]).then(ok => ok && !autoTake && toast('已播出：' + sceneName(pv.scene))); },
+  kvPreset() { Object.assign(pv, { theme: 'star', bg: 'kv', bgDim: 78 }); pv.poster.id = 'kv'; pv.standby.kv = true; afterPv(); if (!autoTake) toast('已套用到預覽，按 TAKE 播出'); },
   pvReset() { pv = clone(S.display); render(); },
   reveal(b) { const v = +b.dataset.v, nv = v < 0 ? Math.max(0, S.display.board.hide - 1) : v; if (pv) pv.board.hide = nv; send([{ op: 'set', path: ['display', 'board', 'hide'], value: nv }]); },
   preset(b) { const m = MSG_PRESETS[+b.dataset.i]; pv.msg = { label: m[0], title: m[1], sub: m[2] }; afterPv(); },
@@ -1416,6 +1518,7 @@ document.addEventListener('change', e => {
   if (t.id === 'autoTake') { autoTake = t.checked; sessionStorage.setItem('sc_autotake', autoTake ? '1' : ''); if (autoTake) ACT.take(); render(); return; }
   if (t.id === 'devLabel') { reconnect(); render(); return; }
   if (t.dataset.crit) { if (t.type === 'number' && t.value !== '') { t.value = Math.max(0, Math.min(scale(), +t.value)); setCrit(t); } return; }
+  if (t.dataset.rd && t.dataset.f === 'advanceBy') { send([{ op: 'set', path: ['rounds', t.dataset.rd, 'advanceBy', t.dataset.g], value: Math.max(0, Math.round(+t.value || 0)) }]); return; }
   if (t.dataset.rd) {
     const f = t.dataset.f, v = t.type === 'checkbox' ? t.checked : (f === 'advance' || f === 'carry') ? Math.max(0, Math.min(f === 'carry' ? 100 : 999, Math.round(+t.value || 0))) : (t.value.trim() || R(t.dataset.rd).name);
     send([{ op: 'set', path: ['rounds', t.dataset.rd, f], value: v }]); return;
