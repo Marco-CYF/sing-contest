@@ -17,6 +17,7 @@ const PIN = process.env.ADMIN_PIN || '';
 const DIR = __dirname;
 const DATA = path.join(DIR, 'data.json');
 const BACKUP_DIR = path.join(DIR, 'backups');
+const ASSET_DIR = path.join(DIR, 'assets');
 
 // ---------- 狀態與存檔 ----------
 let state = {};
@@ -133,6 +134,30 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === 'GET' && u.pathname === '/api/state') return json(res, 200, state);
+
+  // 大螢幕素材（海報、背景、Logo）
+  if (req.method === 'GET' && u.pathname.startsWith('/api/asset/')) {
+    const id = u.pathname.slice('/api/asset/'.length);
+    if (!/^[a-z0-9]{4,24}$/.test(id)) { res.writeHead(404); return res.end(); }
+    fs.readFile(path.join(ASSET_DIR, id + '.txt'), 'utf8', (err, txt) => {
+      if (err) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'private, max-age=86400' });
+      res.end(txt);
+    });
+    return;
+  }
+  if (req.method === 'POST' && u.pathname === '/api/asset') {
+    let body;
+    try { body = JSON.parse(await readBody(req, 15 * 1024 * 1024)); } catch (e) { return json(res, 400, { error: 'bad body' }); }
+    if (PIN && body.pin !== PIN) return json(res, 403, { error: 'pin' });
+    if (!/^[a-z0-9]{4,24}$/.test(body.id || '')) return json(res, 400, { error: 'bad id' });
+    const file = path.join(ASSET_DIR, body.id + '.txt');
+    if (body.delete) { fs.unlink(file, () => {}); return json(res, 200, { ok: true }); }
+    if (typeof body.data !== 'string' || !body.data.startsWith('data:image/')) return json(res, 400, { error: 'not image' });
+    try { fs.mkdirSync(ASSET_DIR, { recursive: true }); fs.writeFileSync(file, body.data); }
+    catch (e) { return json(res, 500, { error: 'write failed' }); }
+    return json(res, 200, { ok: true });
+  }
 
   if (req.method === 'POST' && u.pathname === '/api/ops') {
     let body;
